@@ -51,9 +51,37 @@ test('浏览器页面显示服务端版本，登录后提示新版本和手动�
   await expect(page.getByRole('button', { name: '当前版本 0.2.0', exact: true })).toBeInViewport()
   await page.getByLabel('管理员密码').fill(fixture.admin_password)
   await page.getByRole('button', { name: '进入中转台' }).click()
+  await page.getByRole('button', { name: '展开菜单', exact: true }).click()
   await expect(page.getByRole('button', { name: '当前版本 0.2.0', exact: true })).toBeInViewport()
   await page.getByRole('button', { name: '发现新版本 0.3.0' }).click()
   const link = page.locator('dialog[open]').getByRole('link', { name: /查看 GitHub 发布页/ })
   await expect(link).toHaveAttribute('href', release.url)
   await expect(link).toHaveAttribute('target', '_blank')
+})
+
+test('Long preview version stays within the expanded sidebar', async ({ page }) => {
+  const version = '0.1.1-preview.20260923.14'
+  await page.route('**/api/version', route => route.fulfill({ json: { version } }))
+  await page.route('**/api/update', route => route.fulfill({ json: { configured: false, current_version: version, available: false } }))
+  const fixture = JSON.parse(readFileSync('.test-fixture/connection.json', 'utf8'))
+  await page.request.post('/api/login', { data: { username: 'ssh-admin', password: fixture.admin_password } })
+  for (const language of ['zh-CN', 'en']) {
+    await page.goto('/?lang=' + language)
+    await expect(page.locator('#workspace-sidebar')).toBeVisible()
+    const expand = page.getByRole('button', { name: language === 'en' ? 'Expand menu' : '展开菜单', exact: true })
+    if (await expand.isVisible()) await expand.click()
+    for (const width of [1440, 800]) {
+      await page.setViewportSize({ width, height: 800 })
+      const label = page.locator('.sidebar-version .version-label')
+      const number = page.locator('.sidebar-version .version-number')
+      await expect(number).toHaveAttribute('title', 'v' + version)
+      const labelBox = (await label.boundingBox())!
+      const numberBox = (await number.boundingBox())!
+      const sidebar = (await page.locator('#workspace-sidebar').boundingBox())!
+      expect(labelBox.height).toBeLessThan(25)
+      expect(numberBox.y).toBeGreaterThanOrEqual(labelBox.y + labelBox.height)
+      expect(numberBox.x + numberBox.width).toBeLessThanOrEqual(sidebar.x + sidebar.width)
+      await page.screenshot({ path: `test-results/sidebar-version-${language}-${width}.png` })
+    }
+  }
 })

@@ -170,30 +170,44 @@ func replyError(reply gateway.DesktopReply) error {
 	return fmt.Errorf("%s", body.Error)
 }
 
-// OpenMachineWindow 在系统浏览器中打开独立工作页，沿用桌面登录。
+// OpenMachineWindow opens WebSSH in a separate application window.
 func (a *App) OpenMachineWindow(target string) error {
-	core, err := a.machineCore()
-	if err != nil {
-		return err
-	}
-	address, err := core.MachineWindowURL(target)
-	if err != nil {
-		return err
-	}
-	return a.application.Browser.OpenURL(a.windowLanguage(address))
+	return a.openMachineWindow(target, "")
 }
 
-// OpenMachineConnectionWindow 用所选账号打开独立工作页。
+// OpenMachineConnectionWindow preserves the selected account in the new window.
 func (a *App) OpenMachineConnectionWindow(target, selection string) error {
+	return a.openMachineWindow(target, selection)
+}
+
+func (a *App) openMachineWindow(target, selection string) error {
 	core, err := a.machineCore()
 	if err != nil {
+		return err
+	}
+	reply, err := core.Call("GET", "/targets/"+url.PathEscape(target), "")
+	if err != nil {
+		return err
+	}
+	if reply.Status != 200 {
+		return replyError(reply)
+	}
+	var machine struct {
+		Name string `json:"name"`
+	}
+	if err := json.Unmarshal(reply.Data, &machine); err != nil {
 		return err
 	}
 	address, err := core.MachineWindowURL(target, selection)
 	if err != nil {
 		return err
 	}
-	return a.application.Browser.OpenURL(a.windowLanguage(address))
+	// Keep the one-use login ticket on the loopback server; never send it to an external browser.
+	a.application.Window.NewWithOptions(application.WebviewWindowOptions{
+		Title: machine.Name + " — WebSSH", URL: a.windowLanguage(address),
+		Width: 1440, Height: 960, MinWidth: 800, MinHeight: 600,
+	})
+	return nil
 }
 
 // OpenExternalURL 将网页交给系统浏览器，保留桌面工作区。

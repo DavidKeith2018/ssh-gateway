@@ -20,6 +20,13 @@ func (s *Store) migrateAccountsAndNotes() error {
 	_, err = tx.Exec(`CREATE TABLE IF NOT EXISTS users (
  id TEXT PRIMARY KEY, username TEXT NOT NULL UNIQUE, password_hash BLOB NOT NULL,
  enabled INTEGER NOT NULL, epoch INTEGER NOT NULL);
+ CREATE TABLE IF NOT EXISTS file_favorites (
+ user_id TEXT NOT NULL, target_id TEXT NOT NULL, path TEXT NOT NULL, kind TEXT NOT NULL,
+ PRIMARY KEY(user_id,target_id,path));
+ CREATE TRIGGER IF NOT EXISTS delete_user_favorites AFTER DELETE ON users BEGIN
+ DELETE FROM file_favorites WHERE user_id=OLD.id; END;
+ CREATE TRIGGER IF NOT EXISTS delete_target_favorites AFTER DELETE ON targets BEGIN
+ DELETE FROM file_favorites WHERE target_id=OLD.id; END;
  CREATE TABLE IF NOT EXISTS user_targets(user_id TEXT NOT NULL,target_id TEXT NOT NULL,PRIMARY KEY(user_id,target_id));
  CREATE TABLE IF NOT EXISTS user_tags(user_id TEXT NOT NULL,tag TEXT NOT NULL,PRIMARY KEY(user_id,tag));
  CREATE TRIGGER IF NOT EXISTS delete_user_grants AFTER DELETE ON users BEGIN

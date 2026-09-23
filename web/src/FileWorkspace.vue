@@ -31,6 +31,7 @@ import {
   type FileContent,
 } from './machine-api'
 import { monaco, language } from './monaco'
+import FilePreview from './FilePreview.vue'
 import FileTreeNode from './FileTreeNode.vue'
 import FileEntryIcon from './FileEntryIcon.vue'
 import DecisionDialog from './DecisionDialog.vue'
@@ -62,6 +63,15 @@ watch(directoryError, message => {
   if (message) connectionErrors?.report('directory', message)
   else connectionErrors?.recover('directory')
 })
+interface PreviewDocument {
+  path: string
+  content: { mime: string; data: string } | null
+  error: string
+}
+const previews = ref<PreviewDocument[]>([])
+const lastOpenedDirectory = ref('')
+const previewPath = ref('')
+const previewExtensions = /\.(png|jpe?g|gif|webp|bmp|ico|svg|avif|pdf|mp3|wav|ogg|flac|m4a|mp4|webm|mov)$/i
 const error = ref(''),
   note = ref(''),
   menu = ref<{ x: number; y: number; entry: FileEntry | null } | null>(null)
@@ -76,6 +86,33 @@ let controller = new AbortController()
 let noteController = new AbortController()
 const sharedConnection = inject(machineConnectionKey)
 const sharedID = () => sharedConnection?.value || ''
+const directoryKey = `ssh-gateway:last-directory:${props.target.id}`
+const directoryCookie = `ssh-gateway-directory-${encodeURIComponent(props.target.id)}`
+function savedDirectory() {
+ try {
+  const cookie = document.cookie.split('; ').find(value => value.startsWith(directoryCookie + '='))?.slice(directoryCookie.length + 1)
+  const path = (cookie ? decodeURIComponent(cookie) : localStorage.getItem(directoryKey)) || '/'
+  return path.startsWith('/') ? path : '/'
+ } catch { return '/' }
+}
+function rememberDirectory(path: string) {
+ try { localStorage.setItem(directoryKey, path) } catch {}
+ if (path.length < 2000) document.cookie = `${directoryCookie}=${encodeURIComponent(path)}; Path=/; Max-Age=31536000; SameSite=Strict`
+}
+async function listWithFallback(path: string, fallback: boolean): Promise<Directory> {
+ for (;;) {
+  try { return await call<Directory>({ op: 'list', path }) }
+  catch (error) {
+   if (!fallback || !(error instanceof MachineError) || error.status !== 404 || !path || path === '/') throw error
+   delete childrenByPath[path]
+   expanded.delete(path)
+   path = parentPath(path)
+   delete childrenByPath[path]
+  }
+ }
+}
+function refreshCurrentDirectory() { return navigate(lastOpenedDirectory.value || root.value || savedDirectory(), true, true) }
+
 let requestedPath = ''
 const resolvedPaths = new Map<string, string>()
 let directoryEpoch = 0,
@@ -120,12 +157,12 @@ function call<T>(body: unknown) {
   return machineAPI<T>(props.target.id, 'files', body, controller.signal, sharedID())
 }
 // 系统树始终以 / 为根，当前目录只决定定位和空白处文件操作的目标。
-async function navigate(path = '/', reveal = true) {
+async function navigate(path = '/', reveal = true, fallback = false) {
   const epoch = ++directoryEpoch
   directoryError.value = ''
   loading.add('$root')
   try {
-    const target = await call<Directory>({ op: 'list', path })
+    const target = await listWithFallback(path, fallback)
     if (epoch !== directoryEpoch) return
     const ancestors = ['/']
     let cursor = ''
@@ -144,7 +181,9 @@ async function navigate(path = '/', reveal = true) {
       if (data) childrenByPath[ancestor] = data.entries
       expanded.add(ancestor)
     }
+    lastOpenedDirectory.value = target.path
     root.value = target.path
+    rememberDirectory(target.path)
     selected.value = target.path
     if (reveal) await revealSelected()
   } catch (e) {
@@ -163,6 +202,7 @@ async function revealSelected() {
 function selectEntry(entry: FileEntry) {
   selected.value = entry.path
   root.value = entry.kind === 'directory' ? entry.path : parentPath(entry.path)
+  rememberDirectory(root.value)
 }
 async function toggle(entry: FileEntry) {
   selectEntry(entry)
@@ -170,6 +210,7 @@ async function toggle(entry: FileEntry) {
     expanded.delete(entry.path)
     return
   }
+  lastOpenedDirectory.value = entry.path
   expanded.add(entry.path)
   if (childrenByPath[entry.path] || loading.has(entry.path)) return
   loading.add(entry.path)
@@ -195,18 +236,34 @@ async function refreshDirectory(path: string) {
     if (epoch === directoryEpoch) childrenByPath[path] = data.entries
   } finally { loading.delete(path) }
 }
-function favorite(entry: FileEntry) {
-  if (favorites.value.some((f) => f.path === entry.path))
-    favorites.value = favorites.value.filter((f) => f.path !== entry.path)
-  else favorites.value.push({ ...entry })
-  persistFavorites()
+let favoriteQueue = Promise.resolve()
+function updateFavorites(op: 'read' | 'add' | 'remove' | 'import', entries: FileEntry[] = []) {
+  const task = favoriteQueue.then(async () => {
+    const result = await machineAPI<FileEntry[]>(props.target.id, 'favorites', {
+      op, entries: entries.map(({ path, kind }) => ({ path, kind })),
+    }, noteController.signal)
+    if (!disposed) favorites.value = result
+  })
+  favoriteQueue = task.catch(() => {})
+  return task
 }
-function persistFavorites() {
+async function favorite(entry: FileEntry) {
   try {
-    localStorage.setItem(favoriteKey, JSON.stringify(favorites.value))
-  } catch {
-    error.value = msg('text.56d89427eae0')
-  }
+    await favoriteQueue
+    await updateFavorites(favorites.value.some(f => f.path === entry.path) ? 'remove' : 'add', [entry])
+  } catch (e) { if (!disposed) error.value = errorText(e) }
+}
+async function loadFavorites() {
+  try {
+    await updateFavorites('read')
+    let stored: unknown
+    try { stored = JSON.parse(localStorage.getItem(favoriteKey) || '[]') } catch { return }
+    if (!Array.isArray(stored)) return
+    const legacy = stored.filter(e => typeof e?.path === 'string' && e.path.startsWith('/') && ['file', 'directory', 'link'].includes(e.kind))
+    if (legacy.length) await updateFavorites('import', legacy)
+    // Keep the old copy on failure, so migration can be retried safely.
+    localStorage.removeItem(favoriteKey)
+  } catch (e) { if (!disposed) error.value = errorText(e) }
 }
 async function locate(entry: FileEntry) {
   await navigate(
@@ -229,6 +286,8 @@ function hideMenu() {
   menu.value = null
 }
 function activate(d: Document) {
+  previewPath.value = ''
+  if (!d.local) lastOpenedDirectory.value = parentPath(d.path)
   requestedPath = d.path
   if (active.value && editor) active.value.view = editor.saveViewState()
   activePath.value = d.path
@@ -236,6 +295,26 @@ function activate(d: Document) {
   editor?.updateOptions({ readOnly: !!d.local && !d.loaded })
   if (d.view) editor?.restoreViewState(d.view)
   editor?.focus()
+}
+function activatePreview(doc: PreviewDocument) {
+  if (!previewPath.value && active.value && editor) active.value.view = editor.saveViewState()
+  requestedPath = doc.path
+  previewPath.value = doc.path
+  lastOpenedDirectory.value = parentPath(doc.path)
+  error.value = ''
+  note.value = ''
+}
+function closePreview(doc: PreviewDocument) {
+  const index = previews.value.indexOf(doc)
+  previews.value = previews.value.filter(item => item !== doc)
+  if (previewPath.value !== doc.path) return
+  const next = previews.value[Math.min(index, previews.value.length - 1)]
+  if (next) activatePreview(next)
+  else {
+    previewPath.value = ''
+    if (active.value) activate(active.value)
+    else requestedPath = ''
+  }
 }
 function documentName(doc: Document) {
   return doc.local ? msg('text.b778e307964f') : baseName(doc.path)
@@ -310,6 +389,22 @@ async function open(entry: FileEntry) {
     await navigate(entry.path)
     return
   }
+  lastOpenedDirectory.value = parentPath(entry.path)
+  if (previewExtensions.test(entry.path)) {
+    let doc = previews.value.find(item => item.path === entry.path)
+    if (doc) { activatePreview(doc); return }
+    previews.value.push({ path: entry.path, content: null, error: '' })
+    doc = previews.value[previews.value.length - 1]!
+    activatePreview(doc)
+    try {
+      const result = await call<{ path: string; mime: string; data: string }>({ op: 'preview', path: entry.path })
+      if (!disposed && previews.value.includes(doc)) doc.content = result
+    } catch (e) {
+      if (!disposed && previews.value.includes(doc)) doc.error = errorText(e)
+    }
+    return
+  }
+  previewPath.value = ''
   requestedPath = entry.path
   const existing = documents.value.find(
     (d) => d.path === (resolvedPaths.get(entry.path) || entry.path),
@@ -484,10 +579,9 @@ async function remove(entry: FileEntry) {
   try {
     await call({ op: 'delete', path: entry.path })
     affected.forEach(disposeDoc)
-    favorites.value = favorites.value.filter(
-      (f) => f.path !== entry.path && !f.path.startsWith(entry.path + '/'),
-    )
-    persistFavorites()
+    await updateFavorites('remove', favorites.value.filter(
+      f => f.path === entry.path || f.path.startsWith(entry.path + '/'),
+    ))
     await refreshDirectory(parentPath(entry.path))
   } catch (e) {
     error.value = errorText(e)
@@ -651,16 +745,7 @@ defineExpose({
   transferring: computed(() => !!transfer.value),
 })
 onMounted(async () => {
-  try {
-    const stored = JSON.parse(localStorage.getItem(favoriteKey) || '[]')
-    if (Array.isArray(stored))
-      favorites.value = stored.filter(
-        (e) =>
-          typeof e?.path === 'string' &&
-          typeof e?.name === 'string' &&
-          ['file', 'directory', 'link'].includes(e.kind),
-      )
-  } catch {}
+  void loadFavorites()
   await nextTick()
   editor = monaco.editor.create(editorElement.value!, {
     automaticLayout: true,
@@ -677,7 +762,7 @@ onMounted(async () => {
     void save()
   })
   openLocalNote()
-  if (sharedID()) void navigate('/', false)
+  if (sharedID()) void navigate(root.value || savedDirectory(), true, true)
   window.addEventListener('click', hideMenu)
   window.addEventListener('keydown', escapeMenu)
 })
@@ -690,7 +775,7 @@ watch(() => sharedID(), () => {
   expanded.clear()
   loading.clear()
   directoryError.value = ''
-  if (sharedID()) void navigate('/', false)
+  if (sharedID()) void navigate(root.value || savedDirectory(), true, true)
 })
 function escapeMenu(e: KeyboardEvent) {
   if (e.key === 'Escape') hideMenu()
@@ -758,6 +843,7 @@ onBeforeUnmount(() => {
       >
         /
       </button>
+      <button :aria-label="t('files.refreshDirectory')" :title="t('files.refreshDirectory')" :disabled="!sharedID() || loading.has('$root')" @click="refreshCurrentDirectory">↻</button>
     </div>
     <p v-if="directoryError && !connectionErrors" class="tree-error" role="alert">
       {{ display(directoryError) }}<button @click="navigate(root || '/')">{{ t('text.b8784c8dd563') }}</button>
@@ -801,11 +887,11 @@ onBeforeUnmount(() => {
           v-for="doc in documents"
           :key="doc.path"
           class="file-tab"
-          :class="{ active: activePath === doc.path }"
+          :class="{ active: !previewPath && activePath === doc.path }"
         >
           <button
             role="tab"
-            :aria-selected="activePath === doc.path"
+            :aria-selected="!previewPath && activePath === doc.path"
             :title="display(doc.location || doc.path)"
             @click="activate(doc)"
           >
@@ -820,8 +906,12 @@ onBeforeUnmount(() => {
             ×
           </button>
         </div>
+        <div v-for="doc in previews" :key="doc.path" class="file-tab" :class="{ active: previewPath === doc.path }">
+          <button role="tab" :aria-selected="previewPath === doc.path" :title="doc.path" @click="activatePreview(doc)">{{ baseName(doc.path) }}</button>
+          <button :aria-label="t('files.closePreview')" :title="doc.path" @click="closePreview(doc)">×</button>
+        </div>
       </div>
-      <div class="editor-actions">
+      <div class="editor-actions" v-if="!previewPath">
         <button
           :aria-label="t('text.adea6b99fe8d')"
           :title="t('text.17dc05229494')"
@@ -847,7 +937,10 @@ onBeforeUnmount(() => {
     <div v-else-if="note" class="file-message" role="status">
       {{ display(note) }}<button :aria-label="t('text.453274a6f188')" @click="note = ''">×</button>
     </div>
-    <div class="editor-container">
+    <template v-for="doc in previews" :key="doc.path">
+      <FilePreview v-show="previewPath === doc.path" :path="doc.path" :preview="doc.content" :failed="!!doc.error" @download="download(doc.path)" />
+    </template>
+    <div v-show="!previewPath" class="editor-container">
       <div ref="editorElement" class="monaco-host" />
       <div v-if="active?.local && !active.loaded" class="editor-empty">
         {{
@@ -858,8 +951,8 @@ onBeforeUnmount(() => {
       </div>
     </div>
     <footer class="editor-status">
-      <span class="truncate" :title="display(active?.location || activePath)">{{
-        display(active?.local ? t('text.c9140b537cd1') : activePath || 'UTF-8')
+      <span class="truncate" :title="display(previewPath || active?.location || activePath)">{{
+        display(previewPath || (active?.local ? t('text.c9140b537cd1') : activePath || 'UTF-8'))
       }}</span
       ><span>{{ display(dirtyCount ? t('text.7ff0b8cf0ff5', [dirtyCount]) : t('text.1bd91a7d0c53')) }}</span>
     </footer>

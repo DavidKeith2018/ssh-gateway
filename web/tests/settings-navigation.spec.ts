@@ -14,7 +14,7 @@ test('系统设置子菜单、中转入口、语言菜单和导入窄屏布局',
  for(const width of [1440,390,320]){
   await page.setViewportSize({width,height:900})
   await page.getByRole('button',{name:'系统设置'}).click()
-  const menu=page.locator('#system-settings-menu');await expect(menu.getByRole('button')).toHaveCount(3)
+  const menu=page.locator('#system-settings-menu');await expect(menu.getByRole('button')).toHaveCount(2)
   const box=await menu.boundingBox();expect(box!.x).toBeGreaterThanOrEqual(0);expect(box!.x+box!.width).toBeLessThanOrEqual(width)
   await menu.getByRole('button',{name:'批量导入机器'}).click()
   const d=page.getByRole('dialog',{name:'批量导入机器'});await expect(d).toBeVisible();await expect(menu).not.toBeVisible()
@@ -41,7 +41,7 @@ test('菜单箭头垂直居中，新增设置提供完整英文',async({page})=>
   }
  }
  await page.setViewportSize({width:1440,height:900})
- for(const title of ['Password encryption','Import machines','Backup and restore']){
+ for(const title of ['Import machines','Backup and restore']){
   await page.getByRole('button',{name:'System settings'}).click()
   const menu=page.locator('#system-settings-menu');await expect(menu).not.toContainText(/[\u4e00-\u9fff]/)
   await menu.getByRole('button',{name:title,exact:true}).click()
@@ -53,4 +53,12 @@ test('菜单箭头垂直居中，新增设置提供完整英文',async({page})=>
  await expect(page.getByRole('dialog')).not.toContainText(/[\u4e00-\u9fff]/)
  await page.keyboard.press('Escape')
  await page.screenshot({path:'test-results/菜单箭头居中-英文.png'})
+})
+
+// Keep navigation visible for these workflows; default collapse is covered by compact-ui.spec.ts.
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => {
+    if (localStorage.getItem('ssh-gateway:sidebar-collapsed') === null)
+      localStorage.setItem('ssh-gateway:sidebar-collapsed', 'false')
+  })
 })

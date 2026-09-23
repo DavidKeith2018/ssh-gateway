@@ -13,10 +13,13 @@ import (
 	"net"
 	"os"
 	"os/exec"
+	"sync/atomic"
 	"time"
 
 	"github.com/godbus/dbus/v5"
 	"github.com/godbus/dbus/v5/prop"
+	"github.com/wailsapp/wails/v3/pkg/application"
+	"github.com/wailsapp/wails/v3/pkg/events"
 	"golang.org/x/crypto/ssh"
 	gateway "ssh-gateway"
 )
@@ -85,6 +88,7 @@ func nativeSmoke() error {
  const input = document.querySelector('#admin-password');
  if (!input) return;
  clearInterval(timer); input.value = 'native-smoke-password'; input.dispatchEvent(new Event('input', {bubbles:true}));
+ const saved = input.closest('form').querySelector('input[type=checkbox][required]'); if(saved && !saved.checked) saved.click();
  input.closest('form').dispatchEvent(new Event('submit', {bubbles:true, cancelable:true}));
 }, 100);`)
 			if err := smokeWait(func() bool { reply, _ := app.Call("GET", "/me", ""); return reply.Status == 200 }); err != nil {
@@ -154,6 +158,35 @@ func nativeSmoke() error {
 				return err
 			}
 
+			// Verify WebSSH opens inside the application and inherits the authenticated session.
+			var machineLoaded atomic.Bool
+			app.application.Window.OnCreate(func(window application.Window) {
+				window.OnWindowEvent(events.Linux.WindowLoadFinished, func(*application.WindowEvent) { machineLoaded.Store(true) })
+			})
+			if err := app.OpenMachineWindow("tray-smoke"); err != nil {
+				return err
+			}
+			windows := app.application.Window.GetAll()
+			if len(windows) != 2 {
+				return fmt.Errorf("WebSSH did not create a separate application window")
+			}
+			for _, window := range windows {
+				if window.ID() == app.window.ID() {
+					continue
+				}
+				if err := smokeWait(machineLoaded.Load); err != nil {
+					return fmt.Errorf("WebSSH window did not finish loading: %w", err)
+				}
+
+				window.Close()
+			}
+			if err := smokeWait(func() bool { return len(app.application.Window.GetAll()) == 1 }); err != nil {
+				return fmt.Errorf("WebSSH close did not release its window: %w", err)
+			}
+			if err := echo("WebSSH window closed; relay stays connected"); err != nil {
+				return err
+			}
+
 			app.window.Close()
 			if err := smokeWait(func() bool { return !app.window.IsVisible() }); err != nil {
 				return fmt.Errorf("关闭未隐藏：%w", err)
@@ -182,7 +215,12 @@ func nativeSmoke() error {
 			}
 			launchCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 			defer cancel()
-			second := exec.CommandContext(launchCtx, executable, "-data", dir)
+			secondDir, err := os.MkdirTemp("", "ssh-gateway-second-instance-")
+			if err != nil {
+				return err
+			}
+			defer os.RemoveAll(secondDir)
+			second := exec.CommandContext(launchCtx, executable, "-data", secondDir)
 			second.Env = append(os.Environ(), "GATEWAY_SMOKE_SECOND_INSTANCE=1")
 			if output, err := second.CombinedOutput(); err != nil {
 				return fmt.Errorf("第二实例失败：%v %s", err, output)

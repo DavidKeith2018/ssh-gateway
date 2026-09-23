@@ -141,11 +141,8 @@
   flex: 1;
   min-height: 0;
   display: grid;
-  grid-template-columns: 260px minmax(0, 1fr) 280px;
-  grid-template-rows: minmax(160px, var(--editor-height)) 6px minmax(
-      150px,
-      1fr
-    );
+  grid-template-columns: var(--tree-width, 260px) minmax(0, 1fr) 280px;
+  grid-template-rows: minmax(0, min(var(--editor-height), calc(100% - 156px))) 6px minmax(0, 1fr);
   gap: 0;
   padding: 0;
 }
@@ -154,7 +151,7 @@
   column-gap: 0;
 }
 .machine-grid.hide-info {
-  grid-template-columns: 260px minmax(0, 1fr) 0;
+  grid-template-columns: var(--tree-width, 260px) minmax(0, 1fr) 0;
 }
 .machine-grid.hide-tree.hide-info {
   grid-template-columns: 0 minmax(0, 1fr) 0;
@@ -400,6 +397,9 @@
   background: #209b7d;
 }
 .machine-terminal {
+  --terminal-background: #f8fafc;
+  padding: 12px 8px 6px 14px;
+  background: var(--terminal-background);
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -409,11 +409,13 @@
 .machine-terminal-body {
   flex: 1;
   min-height: 0;
-  padding: 12px 8px 6px 14px;
-  background: #f8fafc;
+  min-width: 0;
+  overflow: hidden;
 }
-.machine-page[data-theme='dark'] .machine-terminal-body {
-  background: #0d0d0d;
+.machine-terminal-body .xterm { height: 100%; }
+.machine-terminal-body .xterm .xterm-viewport { background: var(--terminal-background); }
+.machine-page[data-theme='dark'] .machine-terminal {
+  --terminal-background: #0d0d0d;
 }
 .terminal-empty {
   margin: auto;
@@ -589,7 +591,7 @@
 @media (max-width: 1199px) {
   .machine-grid,
   .machine-grid.hide-info {
-    grid-template-columns: 240px minmax(0, 1fr) 0;
+    grid-template-columns: var(--tree-width, 240px) minmax(0, 1fr) 0;
     gap: 0;
     padding: 0;
   }
@@ -981,3 +983,11 @@
 }
 
 @media(max-width:760px){.machine-header{padding-right:178px}}
+
+.machine-grid { position: relative; }
+.tree-width-handle { grid-column: 1; grid-row: 1 / 4; justify-self: end; width: 7px; margin-right: -3px; z-index: 25; cursor: col-resize; touch-action: none; }
+.tree-width-handle:hover, .tree-width-handle:focus-visible { background: var(--accent); opacity: .6; outline: none; }
+@media(max-width:899px) { .files-left { width: min(var(--tree-width, 260px), calc(100vw - 40px)); } .tree-width-handle { display: none; } }
+
+.machine-page .tree-more { display: block; max-width: 100%; margin: 0; padding: 4px 0; text-align: left; font-size: 11px; line-height: 1.5; }
+.tree-more-row { padding-right: 7px; }

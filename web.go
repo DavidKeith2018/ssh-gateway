@@ -111,9 +111,9 @@ func decodeJSON(w http.ResponseWriter, r *http.Request, dst any) error {
 func (web *Web) Handler() http.Handler {
 	mux := http.NewServeMux()
 	web.masterPasswordRoutes(mux)
-	mux.HandleFunc("POST /api/targets/{id}/diagnostics", web.administrator(web.startDiagnostic))
-	mux.HandleFunc("GET /api/diagnostics/{job}", web.administrator(web.diagnosticResult))
-	mux.HandleFunc("DELETE /api/diagnostics/{job}", web.administrator(web.diagnosticResult))
+	mux.HandleFunc("POST /api/targets/{id}/diagnostics", web.machineProtected(web.startDiagnostic))
+	mux.HandleFunc("GET /api/diagnostics/{job}", web.protected(web.diagnosticResult))
+	mux.HandleFunc("DELETE /api/diagnostics/{job}", web.protected(web.diagnosticResult))
 	mux.HandleFunc("POST /api/import/preview", web.administrator(web.importPreview))
 	mux.HandleFunc("POST /api/import/commit", web.administrator(web.importCommit))
 	mux.HandleFunc("POST /api/backups", web.administrator(web.exportBackup))
@@ -143,6 +143,7 @@ func (web *Web) Handler() http.Handler {
 	mux.HandleFunc("DELETE /api/global-ips", web.administrator(web.globalIPs))
 	mux.HandleFunc("GET /api/events", web.administrator(web.eventPage))
 	mux.HandleFunc("GET /api/targets/{id}/terminal", web.machineProtected(web.terminal))
+	mux.HandleFunc("POST /api/targets/{id}/favorites", web.machineProtected(web.favorites))
 	mux.HandleFunc("POST /api/targets/{id}/notes", web.machineProtected(web.notes))
 	mux.HandleFunc("POST /api/targets/{id}/files", web.machineProtected(web.files))
 	mux.HandleFunc("GET /api/targets/{id}/resources", web.machineProtected(web.resources))
@@ -155,7 +156,7 @@ func (web *Web) Handler() http.Handler {
 		w.Header().Set("X-Content-Type-Options", "nosniff")
 		w.Header().Set("X-Frame-Options", "DENY")
 		w.Header().Set("Referrer-Policy", "no-referrer")
-		w.Header().Set("Content-Security-Policy", "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'")
+		w.Header().Set("Content-Security-Policy", "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data: blob:; media-src 'self' blob:; frame-src blob:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'")
 		if strings.HasPrefix(r.URL.Path, "/api/") {
 			w.Header().Set("Cache-Control", "no-store")
 			if r.Header.Get("Sec-Fetch-Site") == "cross-site" || !web.sameOrigin(r) {

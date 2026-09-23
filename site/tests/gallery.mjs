@@ -9,6 +9,8 @@ try {
   page.on('pageerror', error => errors.push(error.message));
   await page.goto(base + '/?lang=zh');
   const manifest = JSON.parse(readFileSync('site/screenshots/manifest.json', 'utf8'));
+  expect(manifest.theme).toBe('light');
+  expect(manifest.screenshots).toHaveLength(6);
   const cards = page.locator('.screenshot-grid figure');
   await expect(cards).toHaveCount(manifest.screenshots.length);
   for (const name of manifest.screenshots) {

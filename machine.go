@@ -362,6 +362,8 @@ func (web *Web) files(w http.ResponseWriter, r *http.Request) {
 			return items[i].Name < items[j].Name
 		})
 		result = map[string]any{"path": p, "entries": items}
+	case "preview":
+		result, err = readPreview(c, p)
 	case "read":
 		p, err = c.RealPath(p)
 		if err != nil {

@@ -39,7 +39,7 @@ func (d *Desktop) machineRequest(parent context.Context, target, operation strin
 	return r, d.handler, nil
 }
 func (d *Desktop) MachineCall(ctx context.Context, target, operation, body string, queries ...string) (DesktopReply, error) {
-	if operation != "notes" && operation != "files" && operation != "resources" && operation != "hardware" {
+	if operation != "favorites" && operation != "notes" && operation != "files" && operation != "resources" && operation != "hardware" {
 		return DesktopReply{}, fmt.Errorf("不支持的机器操作")
 	}
 	if len(body) > 12<<20 {

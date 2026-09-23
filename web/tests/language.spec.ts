@@ -98,6 +98,7 @@ test('登录页和主界面右上角入口适配浅深主题与窄屏', async ({
   await page.setViewportSize({ width: 1440, height: 1000 })
   await login(page)
   await expect(page.getByLabel('Active connections', { exact: true })).toBeVisible()
+  await page.getByRole('button', { name: 'Expand menu', exact: true }).click()
   await expect(page.getByRole('button', { name: /^Current version / })).toBeVisible()
   for (const theme of ['light', 'dark']) {
     if (theme === 'dark') await page.getByRole('button', { name: 'Switch to dark theme', exact: true }).click()
@@ -109,9 +110,9 @@ test('登录页和主界面右上角入口适配浅深主题与窄屏', async ({
     await page.setViewportSize({ width: 1440, height: 1000 })
   }
   await page.screenshot({ path: 'test-results/language-dashboard-en.png', fullPage: true })
-  await page.getByRole('button', { name: '♙ Accounts', exact: true }).click()
+  await page.getByRole('button', { name: 'Accounts', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Accounts', exact: true })).toBeVisible()
-  await page.getByRole('button', { name: '⇄ Port forwarding', exact: true }).click()
+  await page.getByRole('button', { name: 'Port forwarding', exact: true }).click()
   await expect(page.getByRole('heading', { name: /Port forwarding/ })).toBeVisible()
 })
 
@@ -216,10 +217,10 @@ test('主密码解锁页可切换且保留输入', async ({ page }) => {
   await page.route('**/api/security', route => route.fulfill({ json: { enabled: true, locked: true } }))
   await page.goto('/?lang=en')
   await expect(page.getByRole('heading', { name: 'Unlock server credentials' })).toBeVisible()
-  await page.getByLabel('Master password', { exact: true }).fill('draft-master-password')
+  await page.getByLabel('Administrator password', { exact: true }).fill('draft-master-password')
   await chooseLanguage(page, 'zh-CN')
   await expect(page.getByRole('heading', { name: '解锁服务器凭证' })).toBeVisible()
-  await expect(page.getByLabel('主密码', { exact: true })).toHaveValue('draft-master-password')
+  await expect(page.getByLabel('管理员密码', { exact: true })).toHaveValue('draft-master-password')
   await rightCorner(page)
 })
 

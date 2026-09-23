@@ -25,6 +25,9 @@ func TestBackupRoundTripAndFailures(t *testing.T) {
 	if err = s.SetAdminPassword(ctx, "backup-admin-password"); err != nil {
 		t.Fatal(err)
 	}
+	if _, err = s.fileFavorites(ctx, "", in.ID, favoriteRequest{Op: "add", Entries: []fileFavorite{{Path: "/demo/folder", Kind: "directory"}}}); err != nil {
+		t.Fatal(err)
+	}
 	data, err := s.ExportBackup(ctx, "backup-password-123")
 	if err != nil {
 		t.Fatal(err)
@@ -54,6 +57,10 @@ func TestBackupRoundTripAndFailures(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer restored.Close()
+	favorites, err := restored.fileFavorites(ctx, "", in.ID, favoriteRequest{Op: "read"})
+	if err != nil || len(favorites) != 1 || favorites[0].Path != "/demo/folder" {
+		t.Fatal("favorites backup restoration failed", err)
+	}
 	r, err := restored.get(ctx, "id", in.ID)
 	if err != nil {
 		t.Fatal(err)

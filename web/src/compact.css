@@ -1,0 +1,170 @@
+/* Shared density overrides; retain each component's colours and interaction states. */
+#app { font-size: 13px; }
+#app :is(.app-layout, .login-page) :is(button, input, select) { font-size: 12px; }
+#app :is(.app-layout, .login-page) button { padding: 5px 9px; }
+#app :is(.app-layout, .login-page) :is(input:not([type=checkbox]):not([type=radio]), select) { padding: 6px 9px; min-height: 30px; }
+#app :is(.app-layout, .login-page) textarea { padding: 7px 9px; font-size: 12px; }
+#app .content { padding: 14px 16px; }
+#app .topbar { height: auto; min-height: 42px; padding: 5px 16px; gap: 6px; font-size: 11px; }
+#app .topbar > span { flex: 0 1 auto; padding: 0; min-height: 0; }
+#app .admin-menu { flex: 0 1 auto; gap: 6px; }
+#app .admin-menu .language-theme-controls { position: static; gap: 5px; }
+#app .avatar { width: 24px; height: 24px; font-size: 11px; }
+#app .page-heading { gap: 10px; margin-bottom: 10px; }
+#app .page-heading h1 { font-size: 20px; line-height: 1.3; margin-bottom: 3px; }
+#app .page-heading .muted { font-size: 12px; line-height: 1.4; }
+#app .page-heading-actions { gap: 6px; }
+#app .stats { gap: 6px; margin-bottom: 8px; align-items: stretch; }
+#app .stat-card { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; padding: 6px 9px; border-radius: 6px; min-width: 0; }
+#app .stat-card > span { font-size: 11px; margin: 0; line-height: 1.3; }
+#app .stat-card strong { font-size: 15px; line-height: 1.3; }
+#app .stat-card strong small { display: inline; margin: 0 0 0 4px; font-size: 10px; font-weight: 400; }
+#app .global-summary-card strong { font-size: 12px; line-height: 1.3; overflow-wrap: anywhere; }
+#app .global-summary-card > small { font-size: 10px; margin: 0; }
+#app .stat-card .badge { padding: 0 3px; font-size: 10px; }
+#app .list-toolbar { padding: 8px 12px; gap: 8px; }
+#app .connection-filters { gap: 7px; }
+#app .polished-select select { min-height: 30px; padding: 5px 26px 5px 8px; font-size: 11px; }
+#app .polished-select::after { right: 10px; }
+#app .pagination { padding: 8px 12px; gap: 5px; font-size: 11px; }
+#app .pagination :is(button, input, select) { min-height: 28px; padding: 3px 6px; font-size: 11px; }
+#app .workspace-footer { padding: 12px 0 0; font-size: 10px; }
+#app .empty-state { padding: 26px 16px; }
+#app .empty-state h2 { font-size: 17px; margin: 8px 0; }
+#app .empty-icon { width: 38px; height: 38px; font-size: 22px; }
+#app :is(.dialog-heading, .dialog-content, .target-editor-header, .target-editor-body) { padding: 14px 18px; }
+#app :is(.dialog-footer, .target-editor-footer) { padding: 10px 18px; }
+#app :is(.dialog-heading, .target-editor-header) h2 { font-size: 17px; }
+#app .form-grid { gap: 11px; }
+#app .editor-block { padding: 11px; }
+#app .compact-menu { padding: 4px; }
+#app .compact-menu button { min-height: 29px; padding: 5px 9px; font-size: 12px; }
+#app :is(.small-dialog, .security-dialog) label { margin-top: 10px; margin-bottom: 10px; }
+#app .mapping-heading { margin-bottom: 12px; gap: 8px; }
+#app .mapping-stats { gap: 6px; margin-bottom: 8px; }
+#app .mapping-stats > div { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 8px; padding: 6px 9px; border-radius: 6px; }
+#app .mapping-stats strong { font-size: 15px; line-height: 1.3; }
+#app .mapping-stats strong small { margin-left: 4px; font-size: 10px; }
+#app .resource-card { padding: 7px 10px; }
+#app .resource-metrics { gap: 4px; margin-bottom: 4px; }
+#app .resource-metrics dt { font-size: 11px; }
+#app .resource-metrics dd { font-size: 13px; line-height: 1.4; }
+#app .resource-card > small { font-size: 10px; }
+#app .mapping-filters { padding: 8px 12px; gap: 6px; }
+#app .mapping-table :is(th,td) { padding: 9px 8px; font-size: 11px; }
+#app :is(.mapping-dialog-heading, .mapping-dialog-body, .mapping-editor) { padding: 14px 18px; }
+#app .mapping-dialog-heading h2 { font-size: 17px; }
+#app :is(.mapping-dialog-footer, .mapping-dialog-actions) { padding: 9px 18px; }
+#app .mapping-endpoints { gap: 10px; margin-bottom: 12px; }
+#app .mapping-endpoint { padding: 11px; }
+#app .mapping-editor .mapping-endpoint h4 { margin-bottom: 10px; }
+#app .machine-header { min-height: 38px; height: 38px; gap: 8px; padding: 0 10px; }
+#app .machine-header nav { gap: 4px; }
+#app .machine-header button { padding: 3px 6px; font-size: 11px; min-height: 26px; }
+#app .machine-page .section-heading { padding: 8px 10px; }
+#app .machine-page :is(.config-card, .hardware-card) { padding-bottom: 8px; }
+#app .machine-dialog { padding: 16px; }
+#app .machine-dialog :is(input:not([type=radio]):not([type=checkbox]), select) { padding: 5px 8px; min-height: 29px; }
+#app .login-page { padding: 24px 20px; }
+#app .login-brand { margin-bottom: 24px; }
+#app .login-layout { gap: 36px; }
+#app .login-intro h1 { font-size: clamp(26px, 2.8vw, 36px); margin-bottom: 14px; }
+#app .intro-lead { font-size: 13px; line-height: 1.65; }
+#app .intro-benefits { margin: 14px 0; gap: 6px 12px; }
+#app .isolation-route { margin: 18px 0 12px; }
+#app .isolation-route > span { padding: 10px 5px; }
+#app .login-card { padding: 24px; }
+@media(min-width:761px) {
+ #app .sidebar { width: 158px; padding: 16px 10px; gap: 8px; }
+ #app .workspace { margin-left: 158px; width: calc(100% - 158px); }
+ #app .sidebar .brand { gap: 7px; padding: 0 4px; }
+ #app .sidebar .brand strong { font-size: 13px; }
+ #app .sidebar .brand small { display: none; }
+ #app .sidebar .brand-symbol { width: 29px; height: 29px; border-radius: 8px; font-size: 17px; }
+ #app .sidebar .nav-label { margin: 12px 7px 5px; font-size: 10px; }
+ #app .sidebar .nav-item { padding: 7px 8px; gap: 7px; margin-bottom: 2px; min-height: 32px; font-size: 12px; }
+ #app .sidebar .nav-item > span:first-child { font-size: 14px; }
+ #app .sidebar-bottom { padding: 10px 5px 0; font-size: 11px; }
+}
+@media(min-width:761px) and (max-width:1050px) {
+ #app .sidebar { width: 142px; }
+ #app .workspace { margin-left: 142px; width: calc(100% - 142px); }
+ #app .topbar { padding: 4px 12px; }
+ #app .topbar > span { font-size: 10px; }
+ #app .admin-menu { gap: 4px; }
+ #app .admin-menu > .avatar, #app .admin-menu > .avatar + span { display: none; }
+ #app .content { padding: 12px; }
+ #app .page-heading h1 { font-size: 18px; }
+}
+@media(max-width:760px) {
+ #app .content { padding: 12px; }
+ #app .sidebar { padding: 10px 12px; }
+ #app .topbar { padding: 6px 12px; }
+ #app .topbar > span { flex: 1 1 100%; }
+ #app .admin-menu { flex: 1 1 100%; }
+ #app .stats { gap: 7px; }
+ #app .stat-card { padding: 6px 8px; }
+ #app .stat-card strong { font-size: 15px; }
+ #app .global-summary-card strong { font-size: 12px; }
+ #app .login-layout { gap: 20px; }
+ #app .login-card { padding: 20px; }
+ #app :is(.app-layout, .login-page) :is(button, input:not([type=checkbox]):not([type=radio]), select) { min-height: 32px; }
+ #app .machine-header { height: auto; min-height: 38px; padding-right: 178px; }
+}
+#app .connection-list .target-address { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#app .connection-list .inline-link { padding: 0; font-size: 11px; white-space: nowrap; }
+@media(max-width:760px) {
+ #app .admin-menu .language-theme-controls { position: absolute; top: 12px; right: 12px; }
+ #app .sidebar .brand { padding-right: 156px; }
+}
+#app .sidebar-toggle-button { display: inline-flex; flex: 0 0 auto; align-items: center; justify-content: center; width: 30px; height: 30px; padding: 3px; font-size: 17px; }
+#app .app-layout.sidebar-collapsed > .sidebar { display: flex; position: fixed; inset: 0 auto 0 0; width: 52px; padding: 0 6px 12px; flex-direction: column; flex-wrap: nowrap; align-items: stretch; gap: 8px; border-right: 1px solid #82958c30; }
+#app .app-layout.sidebar-collapsed > .workspace { width: calc(100% - 52px); margin-left: 52px; }
+#app .sidebar-collapsed .sidebar .brand { flex: 0 0 42px; height: 42px; padding: 0; margin: 0 -6px 6px; justify-content: center; border-bottom: 1px solid #82958c30; }
+#app .sidebar-collapsed .sidebar .brand > div:last-child,
+#app .sidebar-collapsed .sidebar .nav-label,
+#app .sidebar-collapsed .sidebar .nav-text,
+#app .sidebar-collapsed .sidebar .nav-count,
+#app .sidebar-collapsed .sidebar-bottom { display: none; }
+#app .sidebar-collapsed .sidebar .nav-item { width: 40px; min-height: 40px; padding: 8px; justify-content: center; margin: 0; }
+#app .sidebar-collapsed .sidebar .nav-icon { font-size: 20px; line-height: 1; }
+#app .target-status-mappings { display: flex; flex-direction: column; align-items: flex-start; gap: 5px; }
+#app .target-status-mappings .inline-link { font-size: 10px; white-space: nowrap; }
+@media(min-width:761px) {
+ #app .ssh-connections-table th:nth-child(1) { width: 18%; }
+ #app .ssh-connections-table th:nth-child(2) { width: 9%; }
+ #app .ssh-connections-table th:nth-child(3) { width: 13%; }
+ #app .ssh-connections-table th:nth-child(4) { width: 14%; }
+ #app .ssh-connections-table th:nth-child(5) { width: 22%; }
+ #app .ssh-connections-table th:nth-child(6) { width: 24%; }
+}
+#app .target-status-mappings .inline-link { white-space: normal; max-width: 100%; text-align: left; line-height: 1.3; }
+@media(min-width:761px) and (max-width:1100px) {
+ #app .ssh-connections-table .row-actions button { min-width: 0; padding: 4px 3px; font-size: 10px; white-space: normal; }
+}
+
+#app .compact-menu .desktop-session-action { border-top: 1px solid #82958c40; border-radius: 0; margin-top: 4px; padding-top: 9px; }
+
+/* Keep related source restrictions and account selection in one compact cell. */
+#app .connection-access-cell .source-preview { display: block; margin: 0 0 3px; padding: 0; text-align: left; }
+#app .connection-list .connection-access-cell .account-select select { height: 25px; min-height: 25px; padding: 2px 22px 2px 6px; font-size: 11px; }
+@media(min-width:761px) {
+ #app .connection-list th:nth-child(1) { width: 21%; }
+ #app .connection-list th:nth-child(2) { width: 11%; }
+ #app .connection-list th:nth-child(3) { width: 12%; }
+ #app .connection-list th:nth-child(4) { width: 28%; }
+ #app .connection-list th:nth-child(5) { width: 28%; }
+}
+#app .mapping-table { min-width: 0; table-layout: fixed; }
+#app .mapping-table :is(th,td) { overflow-wrap: anywhere; white-space: normal; padding: 7px 6px; }
+#app .mapping-table th:nth-child(1) { width: 14%; }
+#app .mapping-table th:nth-child(2) { width: 13%; }
+#app .mapping-table th:nth-child(3) { width: 10%; }
+#app .mapping-table th:nth-child(4) { width: 17%; }
+#app .mapping-table th:nth-child(5) { width: 20%; }
+#app .mapping-table th:nth-child(6) { width: 12%; }
+#app .mapping-table th:nth-child(7) { width: 14%; }
+#app .mapping-table .mapping-address { white-space: normal; }
+#app .mapping-table .mapping-status { white-space: normal; padding: 2px 4px; }
+#app .mapping-table .mapping-actions { gap: 3px; }
+#app .mapping-table .mapping-actions :is(button,a) { padding: 3px 5px; }

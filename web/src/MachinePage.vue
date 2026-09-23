@@ -8,7 +8,7 @@ import ChevronIcon from './ChevronIcon.vue'
 import { openMachineWindow } from './open-machine-window'
 import { theme, changeTheme } from './theme'
 import { randomID } from './random-id'
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
 import type { Target } from './api'
 import type { TerminalConnectionInfo } from './terminal-transport'
 import TerminalPanel from './TerminalPanel.vue'
@@ -16,6 +16,9 @@ import TerminalQuickActions from './TerminalQuickActions.vue'
 import FileWorkspace from './FileWorkspace.vue'
 import MachineInfo from './MachineInfo.vue'
 import ConnectionInfo from './ConnectionInfo.vue'
+import ConnectionDiagnostic from './ConnectionDiagnostic.vue'
+import { relayOptions, relayActive } from './relay-access'
+const diagnostic = ref<InstanceType<typeof ConnectionDiagnostic>>()
 import DecisionDialog from './DecisionDialog.vue'
 import { useDecision } from './decision'
 import './machine.css'
@@ -30,6 +33,9 @@ const connectionTarget = computed(() => {
  return login ? { ...props.target, user: login.user, auth_type: login.auth_type, relay_user: relay?.username || props.target.relay_user } : props.target
 })
 const selectedUser = computed(() => connectionTarget.value.user)
+const previousTitle = document.title
+watch(() => props.target.name, name => { document.title = `${name} — WebSSH` }, { immediate: true })
+
 
 const emit = defineEmits<{ close: []; edit: [] }>()
 const { decision, finish, ask } = useDecision()
@@ -50,6 +56,29 @@ const dirty = ref(0),
   transferring = ref(false),
   leaving = ref(false)
 
+const treeWidthKey = 'ssh-gateway:tree-width'
+const treeWidth = ref(260)
+try { const cookie = document.cookie.split('; ').find(value => value.startsWith('ssh-gateway-tree-width='))?.split('=')[1]; const saved = Number(cookie || localStorage.getItem(treeWidthKey)); if (Number.isFinite(saved) && saved >= 180) treeWidth.value = Math.min(520, saved) } catch {}
+function setTreeWidth(value: number) {
+  treeWidth.value = Math.max(180, Math.min(520, window.innerWidth - 360, value))
+  try { localStorage.setItem(treeWidthKey, String(treeWidth.value)) } catch {}
+  // Desktop workspace ports change between launches; the layout cookie also survives that change.
+  document.cookie = `ssh-gateway-tree-width=${treeWidth.value}; Path=/; Max-Age=31536000; SameSite=Strict`
+  window.dispatchEvent(new Event('resize'))
+}
+let stopTreeDrag: (() => void) | undefined
+function dragTree(event: PointerEvent) {
+  if (event.button !== 0) return
+  const handle = event.currentTarget as HTMLElement
+  handle.setPointerCapture(event.pointerId)
+  const start = event.clientX, width = treeWidth.value
+  const move = (next: PointerEvent) => setTreeWidth(width + next.clientX - start)
+  stopTreeDrag?.()
+  stopTreeDrag = () => { handle.removeEventListener('pointermove', move); handle.removeEventListener('pointerup', stopTreeDrag!); handle.removeEventListener('pointercancel', stopTreeDrag!) }
+  handle.addEventListener('pointermove', move)
+  handle.addEventListener('pointerup', stopTreeDrag, { once: true })
+  handle.addEventListener('pointercancel', stopTreeDrag, { once: true })
+}
 const showTree = ref(window.innerWidth >= 900),
   showInfo = ref(window.innerWidth >= 1200),
   split = ref(49)
@@ -170,8 +199,10 @@ onMounted(() => {
   window.addEventListener('resize', resize)
 })
 onBeforeUnmount(() => {
+  document.title = previousTitle
   finish(-1)
   stopDrag?.()
+  stopTreeDrag?.()
   window.removeEventListener('beforeunload', beforeUnload)
   window.removeEventListener('resize', resize)
 })
@@ -199,6 +230,7 @@ defineExpose({ leave })
       >
       <div class="grow" />
       <nav>
+        <button :title="t('feature.diagnostics')" @click="diagnostic?.show(target, selection || relayOptions(target).find(relayActive)?.id || 'server:default')">{{ t('feature.diagnostics') }}</button>
         <button
           class="sidebar-toggle"
           :aria-pressed="showTree"
@@ -249,8 +281,9 @@ defineExpose({ leave })
     <div
       class="machine-grid"
       :class="{ 'hide-tree': !showTree, 'hide-info': !showInfo }"
-      :style="{ '--editor-height': `${split}%` }"
+      :style="{ '--editor-height': `${split}%`, '--tree-width': `${treeWidth}px` }"
     >
+      <div v-if="showTree" class="tree-width-handle" role="separator" tabindex="0" aria-orientation="vertical" :aria-label="t('files.resizeDirectory')" :aria-valuenow="treeWidth" :aria-valuemin="180" :aria-valuemax="520" @pointerdown.prevent="dragTree" @keydown.left.prevent="setTreeWidth(treeWidth - 20)" @keydown.right.prevent="setTreeWidth(treeWidth + 20)" />
       <FileWorkspace
         ref="files"
         :target="target"
@@ -345,6 +378,7 @@ defineExpose({ leave })
       </section>
       <MachineInfo v-show="showInfo" :target="target" />
     </div>
+    <ConnectionDiagnostic ref="diagnostic" :can-manage="canManage" />
     <ConnectionInfo
       ref="connectionInfo"
       :target="connectionTarget"

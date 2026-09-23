@@ -19,6 +19,7 @@ for (const language of ['en', 'zh-CN']) {
     const password = page.locator('#admin-password')
     const submit = page.locator('.login-button')
     const alert = page.locator('.login-card [role="alert"]')
+    await page.getByLabel(language==='en'?'I have saved my administrator password safely':'我已妥善保存管理员密码',{exact:true}).check()
     await expect(password).toHaveAttribute('autocomplete', 'new-password')
     await password.fill('a'.repeat(11))
     await submit.click()

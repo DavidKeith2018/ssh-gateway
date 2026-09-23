@@ -1,6 +1,7 @@
 package gateway
 
 import (
+	"bytes"
 	"context"
 	"crypto/rand"
 	"database/sql"
@@ -16,6 +17,13 @@ import (
 const adminUsername = "ssh-admin"
 
 func (s *Store) adminHash(ctx context.Context) ([]byte, error) {
+	s.keyMu.RLock()
+	defer s.keyMu.RUnlock()
+	// The encrypted envelope is authoritative so a password change needs only
+	// one atomic file replacement, without a separate database commit.
+	if hash := unifiedAdminHash(s.keyFile); len(hash) > 0 {
+		return bytes.Clone(hash), nil
+	}
 	var hash []byte
 	err := s.db.QueryRowContext(ctx, `SELECT value FROM settings WHERE name='admin_password'`).Scan(&hash)
 	return hash, err
@@ -29,6 +37,24 @@ func (s *Store) SetAdminPassword(ctx context.Context, password string) error {
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		return err
+	}
+	s.keyMu.Lock()
+	defer s.keyMu.Unlock()
+	if s.aead == nil {
+		return ErrMasterLocked
+	}
+	if len(s.keyFile) != 32 {
+		data, err := wrapUnifiedMasterKey(s.dataKey, password, hash)
+		if err != nil {
+			return err
+		}
+		defer clear(data)
+		if err = replaceMasterKey(s.dir, s.keyFile, data); err != nil {
+			return err
+		}
+		clear(s.keyFile)
+		s.keyFile = bytes.Clone(data)
+		return nil
 	}
 	_, err = s.db.ExecContext(ctx, `INSERT INTO settings VALUES ('admin_password', ?) ON CONFLICT(name) DO UPDATE SET value=excluded.value`, hash)
 	return err
@@ -56,6 +82,10 @@ func (s *Store) EnsureAdmin(ctx context.Context) (string, error) {
 	}
 	if n, _ := result.RowsAffected(); n == 0 {
 		return "", nil
+	}
+	if err := s.SetCredentialProtection(ctx, password, true); err != nil {
+		_, _ = s.db.ExecContext(ctx, `DELETE FROM settings WHERE name='admin_password' AND value=?`, hash)
+		return "", err
 	}
 	return password, nil
 }

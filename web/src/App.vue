@@ -9,12 +9,9 @@ const shortcutManager = ref<InstanceType<typeof TerminalQuickActions>>()
 import AccountWorkspace from './AccountWorkspace.vue'
 import { theme, changeTheme } from './theme'
 import { openMachineWindow } from './open-machine-window'
-import SecuritySettings from './SecuritySettings.vue'
 import BackupPanel from './BackupPanel.vue'
 import ImportTargets from './ImportTargets.vue'
-import ConnectionDiagnostic from './ConnectionDiagnostic.vue'
 const importTargets=ref<InstanceType<typeof ImportTargets>>()
-const diagnostic=ref<InstanceType<typeof ConnectionDiagnostic>>()
 import ProgramUpdate from './ProgramUpdate.vue'
 import LanguageSwitcher from './LanguageSwitcher.vue'
 const programUpdate = ref<InstanceType<typeof ProgramUpdate>>()
@@ -67,16 +64,45 @@ function positionSettings(event: MouseEvent) {
   const rect = (event.currentTarget as HTMLElement).getBoundingClientRect()
   if (systemMenu.value) { systemMenu.value.style.top = `${rect.bottom + 6}px`; systemMenu.value.style.left = `${Math.max(8, Math.min(rect.right - 190, innerWidth - 198))}px` }
 }
+const sidebarCollapsed = ref(true)
+try { sidebarCollapsed.value = localStorage.getItem('ssh-gateway:sidebar-collapsed') !== 'false' } catch {}
+function toggleSidebar() {
+  sidebarCollapsed.value = !sidebarCollapsed.value
+  try { localStorage.setItem('ssh-gateway:sidebar-collapsed', String(sidebarCollapsed.value)) } catch {}
+}
 const systemMenu = ref<HTMLElement>()
 const backupDialog = ref<HTMLDialogElement>()
 const backupPanel = ref<InstanceType<typeof BackupPanel>>()
-const securitySettings = ref<InstanceType<typeof SecuritySettings>>()
 const vault = ref<MasterPasswordStatus>({ enabled: false, locked: false })
 const unlockPassword = ref(''), unlockError = ref('')
-const setupProtection = ref(false), setupMaster = ref(''), setupMasterConfirm = ref('')
+const passwordSaved = ref(false), rememberPassword = ref(false)
+let rememberedDirectory = ''
+let rememberedLogin: {username:string;password:string}|undefined
+async function loadRememberedLogin() {
+ if (!native || vault.value.locked || !desktopInfo.value?.ready || desktopInfo.value.needs_setup || rememberedDirectory === desktopInfo.value.data_dir) return
+ rememberedDirectory = desktopInfo.value.data_dir
+ try {
+  const saved = await native.RememberedLogin()
+  if (saved?.password) {
+   rememberedLogin = saved; rememberPassword.value = true
+   if (!password.value) { username.value = saved.username; password.value = saved.password }
+  }
+ } catch { /* An unavailable keyring must not block manual login. */ }
+}
+async function changeRememberPassword() {
+ if (!rememberPassword.value && native) {
+  try { await native.ForgetRememberedLogin(); rememberedLogin = undefined }
+  catch { loginError.value = unlockError.value = msg('desktop.rememberRemoveFailed'); rememberPassword.value = true }
+ }
+}
+async function persistRememberedLogin(account:string, secret:string) {
+ if (!native || !rememberPassword.value) return
+ try { await native.SaveRememberedLogin(account,secret); rememberedLogin={username:account,password:secret} }
+ catch { notify(msg('desktop.rememberFailed'),true) }
+}
 async function unlockCredentials() {
   busy.value = 'unlock'; unlockError.value = ''
-  try { if (masterTransportError) throw new Error(masterTransportError); vault.value = await api<MasterPasswordStatus>('/unlock', 'POST', { password: unlockPassword.value }); unlockPassword.value = ''; await restore() }
+  try { if (masterTransportError) throw new Error(masterTransportError); vault.value = await api<MasterPasswordStatus>('/unlock', 'POST', { password: unlockPassword.value }); if (native) { username.value = 'ssh-admin'; password.value = unlockPassword.value }; unlockPassword.value = ''; await restore() }
   catch (e) { unlockError.value = message(e); unlockPassword.value = '' }
   finally { busy.value = '' }
 }
@@ -243,6 +269,7 @@ async function restore() {
   try {
     await updateDesktop()
     vault.value = await api<MasterPasswordStatus>('/security')
+    await loadRememberedLogin()
     if (vault.value.locked) { me.value = null; return }
     if (desktopInfo.value && (!desktopInfo.value.ready || desktopInfo.value.needs_setup)) return
     me.value = await api<Me>('/me')
@@ -266,19 +293,26 @@ async function login() {
       const passwordBytes = new TextEncoder().encode(password.value).length
       if (passwordBytes < 12) throw new Error(msg('setup.adminPasswordTooShort'))
       if (passwordBytes > 72) throw new Error(msg('backend.2b1431756f24'))
-      if (setupProtection.value && setupMaster.value !== setupMasterConfirm.value) throw new Error(msg('text.61153d5c7dd3'))
-      await api('/desktop/setup', 'POST', { password: password.value, master_password: setupProtection.value ? setupMaster.value : '' })
-      setupMaster.value = setupMasterConfirm.value = ''; await updateDesktop()
+      if (!passwordSaved.value) throw new Error(msg('desktop.savePasswordReminder'))
+      await api('/desktop/setup', 'POST', { password: password.value })
+      await updateDesktop()
     }
     await api('/login', 'POST', { username: desktopInfo.value?.needs_setup ? 'ssh-admin' : username.value, password: password.value })
+    const loginSecret = password.value, loginAccount = username.value
     password.value = ''
     await restore()
-  } catch (error) { loginError.value = message(error) }
+    await persistRememberedLogin(loginAccount,loginSecret)
+  } catch (error) {
+    loginError.value = message(error)
+    if (native && rememberedLogin?.username === username.value && rememberedLogin?.password === password.value) {
+      try { await native.ForgetRememberedLogin(); rememberedLogin=undefined; rememberPassword.value=false } catch {}
+    }
+  }
   finally { busy.value = '' }
 }
 
 function clearSession() {
-  setupMaster.value = setupMasterConfirm.value = unlockPassword.value = ''
+  unlockPassword.value = ''
   terminal.value = null
   desktopDialog.value?.close()
   editor.value?.close()
@@ -379,12 +413,10 @@ watch([locale, terminal], () => { document.title = terminal.value ? t('text.076f
   <main v-else-if="vault.locked" class="login-page">
     <div class="login-brand"><div class="brand-symbol">&gt;_</div><span>{{ t('text.267e3e1a658d') }}</span></div>
     <form class="login-card" @submit.prevent="unlockCredentials">
-      <p class="eyebrow">{{ t('text.10b3510938a3') }}</p><h1>{{ t('text.d23d6c9d746a') }}</h1>
-      <p class="muted">{{ t('text.771e95da8ac0') }}</p>
-      <label>{{ t('text.f36f5f11edef') }}<input v-model="unlockPassword" type="password" autocomplete="off" maxlength="1024" required autofocus /></label>
+      <h1>{{ t('text.d23d6c9d746a') }}</h1>
+      <label>{{ t('text.c19091521d71') }}<input v-model="unlockPassword" type="password" autocomplete="off" maxlength="72" required autofocus /></label>
       <p v-if="unlockError || masterTransportError" class="error" role="alert">{{ display(unlockError || masterTransportError) }}</p>
       <button class="primary login-button" :disabled="!!busy || !!masterTransportError">{{ display(busy ? t('text.671b588e0774') : t('text.5f567907614e')) }}</button>
-      <p class="hint">{{ t('text.cb4d3dfae5c5') }}</p>
     </form>
   </main>
   <main v-else-if="!me" class="login-page">
@@ -404,14 +436,11 @@ watch([locale, terminal], () => { document.title = terminal.value ? t('text.076f
       <label v-if="!desktopInfo?.needs_setup">{{ t('text.1a3f0617d6de') }}<input v-model="username" autocomplete="username" required :placeholder="t('text.201e3f1c1245')" /></label>
       <p v-if="desktopInfo?.error" class="error" role="alert">{{ display(desktopInfo.error) }}</p><label for="admin-password">{{ display(desktopInfo?.needs_setup ? t('text.b5cbe49121fc') : username === 'ssh-admin' ? t('text.c19091521d71') : t('text.fb5bbea8d049')) }}</label>
       <input id="admin-password" v-model="password" type="password" :autocomplete="desktopInfo?.needs_setup ? 'new-password' : 'current-password'" :placeholder="t('text.739d1cc26c30')" required autofocus />
-      <template v-if="desktopInfo?.needs_setup && !vault.enabled">
-        <label class="checkbox-label"><input v-model="setupProtection" type="checkbox" @change="setupMaster = setupMasterConfirm = ''" />{{ t('text.c4ad8dda3ddd') }}</label>
-        <template v-if="setupProtection">
-          <label>{{ t('text.0a72ed1550a7') }}<input v-model="setupMaster" type="password" autocomplete="new-password" minlength="12" maxlength="1024" required /></label>
-          <label>{{ t('text.12aaa082bc80') }}<input v-model="setupMasterConfirm" type="password" autocomplete="new-password" minlength="12" maxlength="1024" required /></label>
-          <p class="hint">{{ t('text.0cd58a85de27') }}</p>
-        </template>
-      </template>
+
+      <p v-if="desktopInfo?.needs_setup" class="hint">{{ t('desktop.savePasswordReminder') }}</p>
+      <label v-if="desktopInfo?.needs_setup" class="checkbox-label"><input v-model="passwordSaved" type="checkbox" required />{{ t('desktop.passwordSaved') }}</label>
+      <label v-if="native" class="checkbox-label"><input v-model="rememberPassword" type="checkbox" @change="changeRememberPassword" />{{ t('desktop.rememberPassword') }}</label>
+      <p v-if="native && rememberPassword" class="hint">{{ t('desktop.rememberHint') }}</p>
       <p v-if="loginError" class="error" role="alert">{{ display(loginError) }}</p>
       <button class="primary login-button" :disabled="!!busy || (!!desktopInfo && !desktopInfo.ready)">{{ display(busy ? t('text.7281e973958f') : desktopInfo?.needs_setup ? t('text.abf777496746') : t('text.6f0c999a5a8a')) }}</button>
       <p v-if="!native" class="hint">{{ t('text.406095a22a9e') }}</p><template v-else><p class="hint">{{ t('text.d21682ed9a10') }}{{ display(desktopInfo?.data_dir) }}</p><button v-if="!desktopInfo?.ready || desktopInfo?.needs_setup" type="button" @click="chooseDirectory">{{ t('text.8c1692e1084b') }}</button></template>
@@ -421,13 +450,13 @@ watch([locale, terminal], () => { document.title = terminal.value ? t('text.076f
   </main>
 
   <main v-else-if="detached" class="loading"><p v-if="detachedError" role="alert">{{ display(detachedError) }}</p><p v-else>{{ t('text.75b2d2120793') }}</p></main>
-  <div v-else class="app-layout" :inert="!!terminal">
-    <aside class="sidebar">
+  <div v-else class="app-layout" :class="{ 'sidebar-collapsed': sidebarCollapsed }" :inert="!!terminal">
+    <aside id="workspace-sidebar" class="sidebar">
       <div class="brand"><div class="brand-symbol">&gt;_</div><div><strong>{{ t('text.267e3e1a658d') }}</strong><small>{{ t('text.66c649904a85') }}</small></div></div>
       <div class="nav-label">{{ t('text.6fed7e860168') }}</div>
-      <button class="nav-item" :class="{ active: tab === 'targets' }" @click="tab = 'targets'"><span>▤</span> {{ t('text.7f4405d07770') }} <span class="nav-count">{{ display(targetStats.total) }}</span></button>
-      <button v-if="me.is_admin" class="nav-item" :class="{ active: tab === 'mappings' }" @click="tab = 'mappings'"><span>⇄</span> {{ t('text.c263674112e4') }}</button>
-      <button v-if="me.is_admin" class="nav-item" :class="{ active: tab === 'users' }" @click="tab = 'users'">{{ t('text.50112fbf8b9e') }}</button>
+      <button class="nav-item" :class="{ active: tab === 'targets' }" :aria-label="t('text.7f4405d07770')" :title="t('text.7f4405d07770')" @click="tab = 'targets'"><span class="nav-icon" aria-hidden="true">▤</span><span class="nav-text">{{ t('text.7f4405d07770') }}</span> <span class="nav-count">{{ display(targetStats.total) }}</span></button>
+      <button v-if="me.is_admin" class="nav-item" :class="{ active: tab === 'mappings' }" :aria-label="t('text.c263674112e4')" :title="t('text.c263674112e4')" @click="tab = 'mappings'"><span class="nav-icon" aria-hidden="true">⇄</span><span class="nav-text">{{ t('text.c263674112e4') }}</span></button>
+      <button v-if="me.is_admin" class="nav-item" :class="{ active: tab === 'users' }" :aria-label="t('text.50112fbf8b9e')" :title="t('text.50112fbf8b9e')" @click="tab = 'users'"><span class="nav-icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="8" r="3.5"/><path d="M5 21v-2a7 7 0 0 1 14 0v2"/></svg></span><span class="nav-text">{{ t('text.50112fbf8b9e') }}</span></button>
       <div class="sidebar-bottom">
         <div :title="display(native ? t('text.76274cc3270b') : t('text.3b7c86631692'))"><span class="status-dot"></span> {{ t('text.d09ccaa70b42') }}
           <div class="muted">{{ t('text.f9e17bfdd423') }} {{ display(me.ssh_port) }}</div>
@@ -437,13 +466,12 @@ watch([locale, terminal], () => { document.title = terminal.value ? t('text.076f
       </div>
     </aside>
     <div class="workspace">
-      <header class="topbar"><span>{{ t('text.6fed7e860168') }} <span class="separator">/</span> {{ display(tab === 'targets' ? t('text.7f4405d07770') : tab === 'mappings' ? t('text.c263674112e4') : t('text.44d36735fde5')) }}</span><div class="admin-menu"><div class="language-theme-controls"><button class="text-button theme-toggle" :aria-label="display(theme === 'light' ? t('text.54e46b7d4249') : t('text.4c3a133c2cf9'))" :title="display(theme === 'light' ? t('text.54e46b7d4249') : t('text.4c3a133c2cf9'))" @click="changeTheme"><span aria-hidden="true">{{ display(theme === 'light' ? '☾' : '☀') }}</span> {{ display(theme === 'light' ? t('text.ed7d2c54184b') : t('text.f56e7eff58bf')) }}</button><LanguageSwitcher v-if="!terminal" /></div><span class="avatar">{{ display(me.is_admin ? t('text.0f9effe3a253') : t('text.04e45efb3be8')) }}</span><span>{{ display(me.is_admin ? t('text.e19796712f1c') : me.username) }}</span><div v-if="me.is_admin" class="settings-menu">
-<button class="text-button menu-trigger" popovertarget="system-settings-menu" @click="positionSettings"><span>{{ t('settings.system') }}</span><svg class="menu-chevron" width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="m4 6 4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg></button>
+      <header class="topbar"><button class="text-button sidebar-toggle-button" aria-controls="workspace-sidebar" :aria-expanded="!sidebarCollapsed" :aria-label="t(sidebarCollapsed ? 'layout.expandMenu' : 'layout.collapseMenu')" :title="t(sidebarCollapsed ? 'layout.expandMenu' : 'layout.collapseMenu')" @click="toggleSidebar"><span aria-hidden="true">☰</span></button><span>{{ t('text.6fed7e860168') }} <span class="separator">/</span> {{ display(tab === 'targets' ? t('text.7f4405d07770') : tab === 'mappings' ? t('text.c263674112e4') : t('text.44d36735fde5')) }}</span><div class="admin-menu"><div class="language-theme-controls"><button class="text-button theme-toggle" :aria-label="display(theme === 'light' ? t('text.54e46b7d4249') : t('text.4c3a133c2cf9'))" :title="display(theme === 'light' ? t('text.54e46b7d4249') : t('text.4c3a133c2cf9'))" @click="changeTheme"><span aria-hidden="true">{{ display(theme === 'light' ? '☾' : '☀') }}</span> {{ display(theme === 'light' ? t('text.ed7d2c54184b') : t('text.f56e7eff58bf')) }}</button><LanguageSwitcher v-if="!terminal" /></div><span v-if="!native" class="avatar">{{ display(me.is_admin ? t('text.0f9effe3a253') : t('text.04e45efb3be8')) }}</span><span v-if="!native">{{ display(me.is_admin ? t('text.e19796712f1c') : me.username) }}</span><div v-if="native || me.is_admin" class="settings-menu">
+<button class="text-button menu-trigger" popovertarget="system-settings-menu" @click="positionSettings"><span>{{ native ? (me.is_admin ? t('text.e19796712f1c') : me.username) : t('settings.system') }}</span><svg class="menu-chevron" width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="m4 6 4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg></button>
 <div id="system-settings-menu" ref="systemMenu" popover class="compact-menu" @click="systemMenu?.hidePopover()">
-<button @click="securitySettings?.show()">{{ t('settings.encryption') }}</button>
-<button @click="importTargets?.show()">{{ t('feature.import') }}</button>
-<button @click="backupDialog?.showModal()">{{ t('feature.backup') }}</button>
-</div></div><button v-if="native && me.is_admin" class="text-button" @click="openDesktopSettings">{{ t('text.108498328f97') }}</button><button class="text-button" @click="logout">{{ display(native ? t('text.3ab8cc15939f') : t('text.498e1d59b4d7')) }}</button><button v-if="native" class="text-button" @click="native.Quit()">{{ t('text.b0d269c8707c') }}</button></div></header>
+<button v-if="me.is_admin" @click="importTargets?.show()">{{ t('feature.import') }}</button>
+<button v-if="me.is_admin" @click="backupDialog?.showModal()">{{ t('feature.backup') }}</button>
+<button v-if="native && me.is_admin" @click="openDesktopSettings">{{ t('text.108498328f97') }}</button><button v-if="native" class="desktop-session-action" @click="logout">{{ display(native ? t('text.3ab8cc15939f') : t('text.498e1d59b4d7')) }}</button><button v-if="native" @click="native.Quit()">{{ t('text.b0d269c8707c') }}</button></div></div><button v-if="!native" class="text-button" @click="logout">{{ t('text.498e1d59b4d7') }}</button></div></header>
       <div class="workspace-scroll">
       <main class="content"><div v-if="desktopInfo?.error" class="notice notice-error" role="alert">{{ display(desktopInfo.error) }}<button v-if="me.is_admin" @click="openDesktopSettings">{{ t('text.06af026e91b8') }}</button></div>
         <div v-if="notice" class="notice" :class="{ 'notice-error': noticeError }" role="status"><span>{{ display(notice) }}</span><button :aria-label="t('text.d301bc125833')" @click="notice = ''">×</button></div>
@@ -457,7 +485,7 @@ watch([locale, terminal], () => { document.title = terminal.value ? t('text.076f
             <div class="list-toolbar"><div><strong>{{ t('text.dbb2c7b44300') }}</strong><span class="badge">{{ display(targetStats.total) }}</span></div><div class="connection-filters"><span class="polished-select tag-filter-select"><select v-model="tagFilter" :aria-label="t('text.99b09ae73155')"><option value="">{{ t('text.b709cb12f0ab') }}</option><option v-for="tag in availableTags" :key="tag" :value="display(tag)">{{ display(tag) }}</option></select></span><input v-model="search" class="search" :aria-label="t('text.74b5a598118b')" :placeholder="t('text.7086c3735b32')" /></div></div>
             <div v-if="targetStats.total === 0 && targetList.loaded" class="empty-state"><div class="empty-icon">&gt;_</div><h2>{{ display(me.is_admin ? t('text.f2343b3efc72') : t('text.f2e680c6c362')) }}</h2><p class="muted">{{ display(me.is_admin ? t('text.e381a908b5ba') : t('text.35170ca96dbd')) }}</p><button v-if="me.is_admin" @click="openEditor()">{{ t('text.2715b6599085') }}</button></div>
             <div v-else-if="filtered.length === 0" class="empty-state"><p>{{ t('text.7b0272977a09') }}</p><button @click="search = ''; tagFilter = ''">{{ t('text.ee32f25f7050') }}</button></div>
-            <div v-else ref="targetScroll" class="table-scroll"><table><thead><tr><th>{{ t('text.9d39d0195c94') }}</th><th>{{ t('text.1d0fd5f9336d') }}</th><th>{{ t('text.6320b4a8722a') }}</th><th v-if="me.is_admin">{{ t('text.c263674112e4') }}</th><th>{{ t('text.0e99a5a8cf79') }}</th><th>{{ t('text.7977db408132') }}</th><th class="actions-heading">{{ t('text.ed31fbb483ee') }}</th></tr></thead><tbody><tr v-for="target in filtered" :key="target.id"><td><div class="target-title"><span class="server-icon">▤</span><div><strong>{{ display(target.name) }}</strong><small class="target-address">{{ display(target.host) }}<span>:{{ display(target.port) }}</span></small></div></div></td><td><div v-if="target.tags?.length" class="target-tags"><span v-for="tag in target.tags" :key="tag" class="badge">{{ display(tag) }}</span></div><span v-else class="muted">—</span></td><td><span class="status-pill" :class="{ disabled: !target.enabled }"><i></i>{{ display(target.enabled ? t('text.8a4ef3e48e4e') : t('text.bc5a87a757a5')) }}</span></td><td v-if="me.is_admin"><button class="inline-link" @click="mappings?.show(target)">{{ t('text.1e01737090c9') }} {{ display(mappingCount(target.id)) }}</button></td><td><button class="source-preview" :aria-label="display(target.name + t('text.944ed90254ca'))" @click="showSources(target)"><code>{{ display(target.allowed_sources[0] || t('text.2f5f1d6fbfb0')) }}</code><small>{{ display(target.allowed_sources.length) }} {{ t('text.27e1f477b32a') }}</small></button></td><td><span class="polished-select account-select"><select class="connection-account-select" :aria-label="display(target.name + t('text.79c3a049f169'))" :value="display(currentConnection(target))" @change="selectConnection(target, ($event.target as HTMLSelectElement).value)"><option v-for="relay in relayOptions(target)" :key="relay.id" :value="display(relay.id)" :disabled="!relayActive(relay)">{{ t('text.dc4b05496399') }} {{ display(relayLabel(target, relay)) }}</option><template v-if="me.is_admin"><option v-for="login in loginOptions(target)" :key="login.id" :value="display('server:' + login.id)">{{ t('text.939fd941988b') }} {{ display(login.user) }}</option></template></select></span><small v-if="currentConnection(target).startsWith('server:')" class="server-account-warning">{{ t('text.6d3dd5ccccf6') }}</small></td><td><div class="row-actions"><button class="primary" :disabled="!currentConnection(target).startsWith('server:') && (!target.enabled || !relayOptions(target).some(r => r.id === currentConnection(target) && relayActive(r)))" @click="connectionDialog?.copyTarget(target, currentConnection(target))">{{ display(currentConnection(target).startsWith('server:') ? t('text.872fdffc7054') : t('text.c4a5b222e09d')) }}</button><button @click="noteDialog?.show(target)">{{ t('text.b778e307964f') }}</button><button v-if="me.is_admin" @click="diagnostic?.show(target,currentConnection(target))">{{ t('feature.diagnostics') }}</button><button v-if="me.is_admin" :disabled="!!busy" @click="openEditor(target)">{{ t('text.051836569928') }}</button><button class="terminal-button" @click="openTerminal(target)">{{ t('text.aac0c509aacb') }}</button></div></td></tr></tbody></table></div>
+            <div v-else ref="targetScroll" class="table-scroll"><table class="ssh-connections-table"><thead><tr><th>{{ t('text.9d39d0195c94') }}</th><th>{{ t('text.1d0fd5f9336d') }}</th><th>{{ t(me.is_admin ? 'layout.statusMappings' : 'text.6320b4a8722a') }}</th><th>{{ t('text.7977db408132') }}</th><th class="actions-heading">{{ t('text.ed31fbb483ee') }}</th></tr></thead><tbody><tr v-for="target in filtered" :key="target.id"><td><div class="target-title"><span class="server-icon">▤</span><div><strong>{{ display(target.name) }}</strong><small class="target-address" :title="`${target.host}:${target.port}`">{{ display(target.host) }}<span>:{{ display(target.port) }}</span></small></div></div></td><td><div v-if="target.tags?.length" class="target-tags"><span v-for="tag in target.tags" :key="tag" class="badge">{{ display(tag) }}</span></div><span v-else class="muted">—</span></td><td><div class="target-status-mappings"><span class="status-pill" :class="{ disabled: !target.enabled }"><i></i>{{ display(target.enabled ? t('text.8a4ef3e48e4e') : t('text.bc5a87a757a5')) }}</span><button v-if="me.is_admin" class="inline-link" @click="mappings?.show(target)">{{ t('text.1e01737090c9') }} {{ display(mappingCount(target.id)) }}</button></div></td><td class="connection-access-cell"><button class="source-preview" :aria-label="display(target.name + t('text.944ed90254ca'))" @click="showSources(target)"><code>{{ display(target.allowed_sources[0] || t('text.2f5f1d6fbfb0')) }}</code></button><span class="polished-select account-select"><select class="connection-account-select" :aria-label="display(target.name + t('text.79c3a049f169'))" :value="display(currentConnection(target))" @change="selectConnection(target, ($event.target as HTMLSelectElement).value)"><option v-for="relay in relayOptions(target)" :key="relay.id" :value="display(relay.id)" :disabled="!relayActive(relay)">{{ t('text.dc4b05496399') }} {{ display(relayLabel(target, relay)) }}</option><template v-if="me.is_admin"><option v-for="login in loginOptions(target)" :key="login.id" :value="display('server:' + login.id)">{{ t('text.939fd941988b') }} {{ display(login.user) }}</option></template></select></span><small v-if="currentConnection(target).startsWith('server:')" class="server-account-warning">{{ t('text.6d3dd5ccccf6') }}</small></td><td><div class="row-actions"><button class="primary" :disabled="!currentConnection(target).startsWith('server:') && (!target.enabled || !relayOptions(target).some(r => r.id === currentConnection(target) && relayActive(r)))" @click="connectionDialog?.copyTarget(target, currentConnection(target))">{{ display(currentConnection(target).startsWith('server:') ? t('text.872fdffc7054') : t('text.c4a5b222e09d')) }}</button><button @click="noteDialog?.show(target)">{{ t('text.b778e307964f') }}</button><button v-if="me.is_admin" :disabled="!!busy" @click="openEditor(target)">{{ t('text.051836569928') }}</button><button class="terminal-button" @click="openTerminal(target)">{{ t('text.aac0c509aacb') }}</button></div></td></tr></tbody></table></div>
             <p v-if="targetList.error" class="error" role="alert">{{ display(targetList.error) }} <button @click="targetList.retry">{{ t('text.b8784c8dd563') }}</button></p>
             <Pagination :label="t('text.ded17f7f73fb')" v-bind="targetList" @change="targetList.change($event, targetScroll)" />
             <div class="list-footer"><span class="status-dot"></span> {{ t('text.2ec469ec1e8b') }}</div>
@@ -493,10 +521,8 @@ watch([locale, terminal], () => { document.title = terminal.value ? t('text.076f
 <div class="dialog-heading"><h2>{{ t('feature.backup') }}</h2><button class="close-button" :aria-label="t('feature.close')" @click="backupDialog?.close()">×</button></div>
 <div class="dialog-content"><BackupPanel ref="backupPanel" /></div>
 </dialog>
-<SecuritySettings v-if="me.is_admin" ref="securitySettings" @change="vault = $event" />
     <ImportTargets v-if="me.is_admin" ref="importTargets" @saved="refresh()" />
-    <ConnectionDiagnostic v-if="me.is_admin" ref="diagnostic" />
-    <TargetEditor ref="editor" :tags="availableTags" :source-i-p="me.source_ip" @saved="savedTarget" @delete="askDelete" />
+    <TargetEditor v-if="me.is_admin" ref="editor" :tags="availableTags" :source-i-p="me.source_ip" @saved="savedTarget" @delete="askDelete" />
 
     <RelayEndpointSettings v-if="me.is_admin" ref="relayEndpointSettings" :ssh-port="me.ssh_port" />
     <div v-if="copyNotice" class="copy-toast" role="status"><span aria-hidden="true">✓</span>{{ display(copyNotice) }}<button :aria-label="t('text.cebbe5163fcd')" @click="copyNotice = ''">×</button></div>

@@ -1,27 +1,68 @@
 <script setup lang="ts">
 import { msg, t, display } from './i18n'
 import ChevronIcon from './ChevronIcon.vue'
-import { computed, nextTick, reactive, ref } from 'vue'
+import { computed, nextTick, reactive, ref, watch } from 'vue'
 import { api, type Target, type TargetLogin, type TargetRelay, type PutResult } from './api'
 import { randomID } from './random-id'
 
 const props = defineProps<{ tags: string[]; sourceIP: string }>()
 const emit = defineEmits<{ saved: [result: PutResult]; delete: [target: Target] }>()
-type Login = TargetLogin & { target_password: string; target_private_key: string; target_key_passphrase: string; saved_type: string; importVersion: number }
+type Login = TargetLogin & { passwordVisible: boolean; revealedPassword: string; keyVisible: boolean; revealedKey: string; passphraseVisible: boolean; revealedPassphrase: string; target_password: string; target_private_key: string; target_key_passphrase: string; saved_type: string; importVersion: number }
 type Relay = TargetRelay & { password: string; automatic: boolean; saved: boolean; expires: string; expiryPreset: number | null }
 const dialog = ref<HTMLDialogElement>()
+const revealingPassword = ref(false)
+let revealVersion = 0
+type SecretKind = 'password' | 'key' | 'passphrase'
+const secretFields = {
+ password: { visible: 'passwordVisible', revealed: 'revealedPassword', draft: 'target_password', response: 'password' },
+ key: { visible: 'keyVisible', revealed: 'revealedKey', draft: 'target_private_key', response: 'private_key' },
+ passphrase: { visible: 'passphraseVisible', revealed: 'revealedPassphrase', draft: 'target_key_passphrase', response: 'passphrase' },
+} as const
+async function toggleSecret(login: Login, kind: SecretKind) {
+ const field = secretFields[kind]
+ if (login[field.visible]) {
+  login[field.visible] = false; login[field.revealed] = ''
+  return
+ }
+ const version = ++revealVersion
+ revealingPassword.value = true; error.value = ''
+ try {
+  let value = login[field.draft]
+  const savedType = kind === 'password' ? 'password' : 'private_key'
+  if (!value && editing.value && login.saved_type === savedType) {
+   const result = await api<{ credential: Record<string, string> }>(`/targets/${encodeURIComponent(form.id)}/logins/${encodeURIComponent(login.id)}/credentials`, 'POST', {})
+   value = result.credential[field.response] || ''
+  }
+  if (version !== revealVersion || !dialog.value?.open) return
+  if (!login[field.draft]) login[field.revealed] = value
+  login[field.visible] = true
+ } catch {
+  if (version === revealVersion) error.value = msg('editor.showSecretFailed')
+ } finally {
+  if (version === revealVersion) revealingPassword.value = false
+ }
+}
+function hideSecrets(login: Login) {
+ login.passwordVisible = login.keyVisible = login.passphraseVisible = false
+ login.revealedPassword = login.revealedKey = login.revealedPassphrase = ''
+}
+
 const formElement = ref<HTMLFormElement>()
 const originalTarget = ref<Target>()
 const editing = ref(false), busy = ref(false), probing = ref(false), error = ref('')
 const tagInput = ref(''), pickingTags = ref(false), activeLogin = ref('')
 const relaySection = ref(false), sourceSection = ref(true), fingerprintSection = ref(false)
 const form = reactive({ id: '', revision: 0, name: '', host: '', port: 22, enabled: true, tags: [] as string[], logins: [] as Login[], relays: [] as Relay[], default_login_id: '', host_fingerprint: '', sources: '' })
+watch(activeLogin, () => {
+ revealVersion++; revealingPassword.value = false
+ form.logins.forEach(hideSecrets)
+})
 const privateSources = '10.0.0.0/8\n172.16.0.0/12\n192.168.0.0/16\n127.0.0.0/8'
 const selectedDefault = computed(() => form.logins.find(login => login.id === form.default_login_id))
 const tagOptions = computed(() => [...new Set([...props.tags, ...form.tags])].filter(tag => !tagInput.value || tag.includes(tagInput.value)))
 const validRelays = computed(() => form.relays.filter(relay => relay.enabled).length)
 function makeLogin(login?: TargetLogin): Login {
-  return { id: login?.id || randomID(), user: login?.user || '', auth_type: login?.auth_type || 'password', target_password: '', target_private_key: '', target_key_passphrase: '', saved_type: login?.auth_type || '', importVersion: 0 }
+  return { passwordVisible: false, revealedPassword: '', keyVisible: false, revealedKey: '', passphraseVisible: false, revealedPassphrase: '', id: login?.id || randomID(), user: login?.user || '', auth_type: login?.auth_type || 'password', target_password: '', target_private_key: '', target_key_passphrase: '', saved_type: login?.auth_type || '', importVersion: 0 }
 }
 function setExpiry(relay: Relay, hours: number) { relay.expiryPreset = hours; relay.expires = hours ? new Date(Date.now()+hours*3600000).toISOString() : '' }
 function makeRelay(loginID: string, relay?: TargetRelay): Relay {
@@ -43,7 +84,7 @@ async function show(target?: Target, showRelays = false) {
   relaySection.value = showRelays
   await nextTick(); dialog.value?.showModal()
 }
-function clearLogin(login: Login) { login.importVersion++; login.target_password = ''; login.target_private_key = ''; login.target_key_passphrase = '' }
+function clearLogin(login: Login) { revealVersion++; revealingPassword.value = false; hideSecrets(login); login.importVersion++; login.target_password = ''; login.target_private_key = ''; login.target_key_passphrase = '' }
 function clearSecrets() { form.logins.forEach(clearLogin); form.relays.forEach(relay => { relay.password = '' }) }
 function close() { if (!busy.value) { dialog.value?.close(); clearSecrets() } }
 function addLogin() {
@@ -155,8 +196,15 @@ defineExpose({ show, close })
               <div class="login-summary"><button type="button" class="login-toggle" :aria-expanded="activeLogin === login.id" @click="activeLogin = activeLogin === login.id ? '' : login.id"><span class="login-avatar">{{ display(index + 1) }}</span><strong>{{ display(login.user || t('text.3bf93765ff0d')) }}</strong><small v-if="form.default_login_id === login.id">{{ t('text.844b8cc8dff7') }}</small><ChevronIcon :direction="activeLogin === login.id ? 'up' : 'down'" /></button><button v-if="form.logins.length > 1" type="button" class="editor-link danger-text" :aria-label="display(t('text.391ca5d9165a', [index + 1]))" @click="removeLogin(login)">×</button></div>
               <div v-show="activeLogin === login.id" class="login-body">
                 <div class="editor-fields equal-fields"><label>{{ t('text.79322d7ec7f4') }}<input v-model="login.user" required maxlength="128" autocomplete="off" :placeholder="t('text.3f9fd09a549d')" /></label><label>{{ t('text.d1ff8f98bc3f') }}<select v-model="login.auth_type" @change="clearLogin(login)"><option value="password">{{ t('text.5c4ddb326e0d') }}</option><option value="private_key">{{ t('text.45ff0431f689') }}</option></select></label></div>
-                <label v-if="login.auth_type === 'password'">{{ t('text.42ceea448f22') }}<input v-model="login.target_password" type="password" autocomplete="new-password" :required="login.saved_type !== 'password'" :placeholder="display(login.saved_type === 'password' ? t('text.fd0b779b22c4') : t('text.c9c58b95c113'))" /></label>
-                <template v-else><label>{{ t('text.9c73b9717a07') }}<textarea v-model="login.target_private_key" rows="3" autocomplete="off" :spellcheck="false" :required="login.saved_type !== 'private_key'" :placeholder="display(login.saved_type === 'private_key' ? t('text.208f089de5b9') : t('text.450685b87398'))" @input="login.importVersion++" /></label><div class="key-file-row"><label class="key-file-button">{{ t('text.69e7bc724c7a') }}<input type="file" @change="importKey($event, login)" /></label><small>{{ t('text.17a60fb23ba7') }}</small></div><label>{{ t('text.0212b3f97253') }}<input v-model="login.target_key_passphrase" type="password" autocomplete="new-password" :placeholder="t('text.844e73e913b3')" /></label></template>
+                <div v-if="login.auth_type === 'password'" class="editor-password-row"><label>{{ t('text.42ceea448f22') }}<input :value="login.target_password || login.revealedPassword" :type="login.passwordVisible ? 'text' : 'password'" @input="login.target_password = ($event.target as HTMLInputElement).value; login.revealedPassword = ''" autocomplete="new-password" :required="login.saved_type !== 'password'" :placeholder="display(login.saved_type === 'password' ? t('text.fd0b779b22c4') : t('text.c9c58b95c113'))" /></label><button type="button" :disabled="busy || revealingPassword || (!login.target_password && (!editing || login.saved_type !== 'password'))"  :aria-pressed="login.passwordVisible" class="secret-toggle" :aria-label="t(login.passwordVisible ? 'editor.hidePassword' : 'editor.showPassword')" :title="t(login.passwordVisible ? 'editor.hidePassword' : 'editor.showPassword')" @click="toggleSecret(login, 'password')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/><path v-if="login.passwordVisible" d="m3 3 18 18"/></svg></button></div>
+                <template v-else>
+                  <div class="editor-password-row private-key-row"><label>{{ t('text.9c73b9717a07') }}
+                    <textarea v-if="login.keyVisible" :value="login.target_private_key || login.revealedKey" rows="3" autocomplete="off" :spellcheck="false" :required="login.saved_type !== 'private_key'" @input="login.target_private_key = ($event.target as HTMLTextAreaElement).value; login.revealedKey = ''; login.importVersion++" />
+                    <input v-else type="password" readonly :value="login.target_private_key ? '********' : ''" :placeholder="display(login.saved_type === 'private_key' ? t('text.208f089de5b9') : t('editor.showKeyToEdit'))" autocomplete="off" />
+                  </label><button type="button" class="secret-toggle" :disabled="busy || revealingPassword" :aria-pressed="login.keyVisible" :aria-label="t(login.keyVisible ? 'editor.hideKey' : 'editor.showKey')" :title="t(login.keyVisible ? 'editor.hideKey' : 'editor.showKey')" @click="toggleSecret(login, 'key')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/><path v-if="login.keyVisible" d="m3 3 18 18"/></svg></button></div>
+                  <div class="key-file-row"><label class="key-file-button">{{ t('text.69e7bc724c7a') }}<input type="file" @change="importKey($event, login)" /></label><small>{{ t('text.17a60fb23ba7') }}</small></div>
+                  <div class="editor-password-row"><label>{{ t('text.0212b3f97253') }}<input :value="login.target_key_passphrase || login.revealedPassphrase" :type="login.passphraseVisible ? 'text' : 'password'" @input="login.target_key_passphrase = ($event.target as HTMLInputElement).value; login.revealedPassphrase = ''" autocomplete="new-password" :placeholder="t('text.844e73e913b3')" /></label><button type="button" class="secret-toggle" :disabled="busy || revealingPassword" :aria-pressed="login.passphraseVisible" :aria-label="t(login.passphraseVisible ? 'editor.hidePassphrase' : 'editor.showPassphrase')" :title="t(login.passphraseVisible ? 'editor.hidePassphrase' : 'editor.showPassphrase')" @click="toggleSecret(login, 'passphrase')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/><path v-if="login.passphraseVisible" d="m3 3 18 18"/></svg></button></div>
+                </template>
                 <label v-if="form.logins.length > 1" class="inline-checkbox"><input v-model="form.default_login_id" type="radio" :value="display(login.id)" :aria-label="display(t('text.a65f262b43ed', [login.user || t('text.9b7df81c876f', [index + 1])]))" />{{ t('text.e6ef500bf381') }}</label>
               </div>
             </section>
@@ -219,4 +267,12 @@ defineExpose({ show, close })
 
 <style scoped>
 .relay-expiry-row{display:flex;align-items:center;gap:10px;margin-top:12px;font-size:12px}.relay-expiry-row>span{white-space:nowrap;flex-shrink:0}.relay-expiry-options{display:flex;flex:1;min-width:0;gap:5px}.relay-expiry-options button{flex:1;min-width:0;padding:6px 3px;white-space:nowrap;font-size:12px;line-height:1.5;border-color:var(--editor-line);background:var(--editor-panel);color:inherit}.relay-expiry-options button[aria-pressed=true]{background:var(--editor-accent-soft);border-color:var(--editor-accent-line);color:var(--editor-strong)}.relay-expiry-options button:focus-visible{outline:2px solid var(--editor-accent);outline-offset:2px}
+</style>
+
+<style scoped>
+.editor-password-row { display: flex; align-items: flex-end; gap: 6px; }
+.editor-password-row > label { flex: 1; min-width: 0; }
+.editor-password-row > button { flex-shrink: 0; }
+.target-editor .secret-toggle { display: grid; place-items: center; width: 30px; height: 30px; padding: 4px; }
+
 </style>

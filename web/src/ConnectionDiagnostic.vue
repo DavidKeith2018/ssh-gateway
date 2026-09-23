@@ -3,6 +3,7 @@ import { ref, onUnmounted } from 'vue'
 import { api, type Target } from './api'
 import { t, type MessageKey, display } from './i18n'
 import { relayOptions, relayLabel, relayActive, loginOptions } from './relay-access'
+defineProps<{ canManage?: boolean }>()
 type Step={name:string;status:string;code:string;duration_ms:number}
 const dialog=ref<HTMLDialogElement>(),target=ref<Target>(),selection=ref(''),job=ref(''),busy=ref(false),steps=ref<Step[]>([]),error=ref(''),done=ref(false)
 let generation=0,timer:ReturnType<typeof setTimeout>|undefined
@@ -30,11 +31,11 @@ defineExpose({show})
   <div class="dialog-heading"><h2 id="diagnostic-heading">{{ t('feature.diagnostics') }}</h2><button type="button" :aria-label="t('feature.close')" @click="close">×</button></div>
   <div v-if="target" class="dialog-content">
    <p>{{ target.name }}</p><p class="hint">{{ t('feature.diagnosticHint') }}</p>
-   <label>{{ t('feature.connection') }}<span class="polished-select diagnostic-account-select"><select v-model="selection" :disabled="busy"><option v-for="relay in relayOptions(target)" :key="relay.id" :value="relay.id" :disabled="!relayActive(relay)">{{ display(relayLabel(target,relay)) }}</option><option v-for="login in loginOptions(target)" :key="login.id" :value="'server:'+login.id">{{ login.user }} · {{ t('feature.direct') }}</option></select></span></label>
+   <label>{{ t('feature.connection') }}<span class="polished-select diagnostic-account-select"><select v-model="selection" :disabled="busy"><option v-for="relay in relayOptions(target)" :key="relay.id" :value="relay.id" :disabled="!relayActive(relay)">{{ display(relayLabel(target,relay)) }}</option><option v-for="login in (canManage ? loginOptions(target) : [])" :key="login.id" :value="'server:'+login.id">{{ login.user }} · {{ t('feature.direct') }}</option></select></span></label>
    <ol class="diagnostic-steps"><li v-for="name in names.filter(n=>n!=='relay'||!selection.startsWith('server:'))" :key="name"><strong>{{ label('stage.',name) }}</strong><span>{{ state(name)?label('status.',state(name)!.status):t(done?'feature.skipped':'feature.waiting') }}</span><small v-if="state(name)">{{ state(name)!.duration_ms }} ms · {{ label('code.',state(name)!.code) }}</small></li></ol>
    <p v-if="error" class="error" role="alert">{{ display(error) }}</p>
    <button v-if="busy" @click="cancel">{{ t('feature.cancel') }}</button><button v-else class="primary" @click="run">{{ t('feature.startDiagnostic') }}</button>
   </div>
  </dialog>
 </template>
-<style scoped>.diagnostic-dialog{width:min(650px,calc(100vw - 24px));max-height:90dvh;overflow:auto}.diagnostic-account-select{width:100%;margin-top:2px}.diagnostic-account-select select{font-size:13px;min-height:42px}.diagnostic-steps{padding-left:20px}.diagnostic-steps li{padding:8px 0}.diagnostic-steps span{margin-left:12px}.diagnostic-steps small{display:block;overflow-wrap:anywhere}</style>
+<style scoped>.diagnostic-dialog{background:var(--surface, #fff);color:var(--text, #243247);border-color:var(--border, #e1e7ef);width:min(650px,calc(100vw - 24px));max-height:90dvh;overflow:auto}.diagnostic-account-select{width:100%;margin-top:2px}.diagnostic-account-select select{font-size:13px;min-height:42px}.diagnostic-steps{padding-left:20px}.diagnostic-steps li{padding:8px 0}.diagnostic-steps span{margin-left:12px}.diagnostic-steps small{display:block;overflow-wrap:anywhere}.diagnostic-dialog .hint,.diagnostic-steps small{color:var(--muted, #607080)}:global(.machine-page[data-theme='dark'] .diagnostic-dialog){background:#263548;color:#edf2f9;border-color:#52647c}:global(.machine-page[data-theme='dark'] .diagnostic-dialog :is(.hint,.diagnostic-steps small)){color:#becbdd}</style>

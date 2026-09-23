@@ -1,6 +1,15 @@
 import { test, expect } from '@playwright/test'
 import { readFileSync } from 'node:fs'
 
+// Server-side favorites survive browser contexts; isolate each test's saved state.
+test.beforeEach(async ({ request }) => {
+  const fixture = JSON.parse(readFileSync('.test-fixture/connection.json', 'utf8'))
+  await request.post('/api/login', {data:{username:'ssh-admin',password:fixture.admin_password}})
+  const endpoint = `/api/targets/${fixture.target.id}/favorites`
+  const entries = await (await request.post(endpoint, {data:{op:'read'}})).json()
+  expect((await request.post(endpoint, {data:{op:'remove',entries}})).ok()).toBe(true)
+})
+
 test('定位深层收藏目录限制并发、复用缓存并停止过期导航', async ({ page }) => {
   const fixture = JSON.parse(readFileSync('.test-fixture/connection.json', 'utf8'))
   const deep = '/' + Array.from({ length: 20 }, (_, i) => '层' + i).join('/')
@@ -36,23 +45,24 @@ test('定位深层收藏目录限制并发、复用缓存并停止过期导航',
   const machine = page.locator('.machine-page')
   await expect(machine.locator('.terminal-tab.active i.online')).toBeVisible()
   await expect(machine.locator('.tree-row[title="/层0"]')).toBeVisible()
-  await machine.getByRole('button', { name: '深层收藏', exact: true }).click()
+  await machine.locator('.favorites button[title="' + deep + '"]').click()
   // 树节点通过 role 标识，选中目录必须完整定位到叶子。
   const selectedRow = machine.locator('[role="treeitem"][aria-selected="true"] > .tree-row')
   await expect(selectedRow).toHaveAttribute('title', deep)
   expect(rejected).toBe(0)
   expect(peak).toBe(1)
   const before = requests.length
-  await machine.getByRole('button', { name: '深层收藏', exact: true }).click()
+  await machine.locator('.favorites button[title="' + deep + '"]').click()
   await expect.poll(() => requests.length).toBe(before + 1)
   await expect.poll(() => active).toBe(0)
   expect(requests.slice(before)).toEqual([deep])
-  await machine.getByRole('button', { name: '其他收藏', exact: true }).click()
+  await machine.locator('.favorites button[title="' + other + '"]').click()
   await expect.poll(() => requests.includes('/另一棵树/层0')).toBe(true)
   await machine.getByRole('button', { name: '定位系统根目录', exact: true }).click()
   await expect(selectedRow).toHaveAttribute('title', '/')
   await expect.poll(() => active).toBe(0)
   expect(requests).not.toContain('/另一棵树/层0/层1/层2/层3/层4')
+  await page.request.post(`/api/targets/${fixture.target.id}/favorites`, {data:{op:'remove',entries:[{path:deep,kind:'directory'},{path:other,kind:'directory'}]}})
 })
 
 test('收藏手风琴、目录即时展开与缓存、目录终端操作及行对齐', async ({ page }) => {
@@ -93,11 +103,13 @@ test('收藏手风琴、目录即时展开与缓存、目录终端操作及行�
   await expect(row.locator('..')).toHaveAttribute('aria-expanded', 'true')
   await expect(row.locator('..')).toHaveAttribute('aria-busy', 'true')
   await expect(tree.getByText('正在加载…', { exact: true })).toBeVisible()
+  const loadingTextX=await tree.getByText('正在加载…',{exact:true}).evaluate(node=>{const range=document.createRange();range.selectNodeContents(node);return range.getBoundingClientRect().x})
   await row.getByRole('button', { name: '收起 ' + entry.name, exact: true }).click()
   await row.getByRole('button', { name: '展开 ' + entry.name, exact: true }).click()
   expect(directoryRequests).toBe(1)
   release()
   await expect(tree.getByText('child.txt', { exact: true })).toBeVisible()
+  expect(Math.abs((await tree.getByText('child.txt',{exact:true}).boundingBox())!.x-loadingTextX)).toBeLessThanOrEqual(1)
   await row.getByRole('button', { name: '收起 ' + entry.name, exact: true }).click()
   await row.getByRole('button', { name: '展开 ' + entry.name, exact: true }).click()
   await expect(tree.getByText('child.txt', { exact: true })).toBeVisible()
@@ -159,4 +171,49 @@ test('收藏手风琴、目录即时展开与缓存、目录终端操作及行�
   await expect(machine.getByRole('menuitem', { name: '打开新终端', exact: true })).toBeEnabled()
   await page.keyboard.press('Escape')
   await page.screenshot({ path: 'test-results/file-tree-alignment.png' })
+})
+
+for (const language of ['en','zh-CN']) {
+ test(`Directory pagination follows child indentation (${language})`, async ({page})=>{
+  const f=JSON.parse(readFileSync('.test-fixture/connection.json','utf8'))
+  await page.route(/\/api\/targets\/[^/]+\/files(?:\?|$)/,async route=>{
+   const body=route.request().postDataJSON()
+   if(body.op!=='list') return route.continue()
+   const path=body.path||'/'
+   const entries=path==='/' ? [{name:'nested',path:'/nested',kind:'directory',size:0,modified:''}] : Array.from({length:103},(_,i)=>({name:`file-${String(i).padStart(3,'0')}.txt`,path:`/nested/file-${String(i).padStart(3,'0')}.txt`,kind:'file',size:0,modified:''}))
+   await route.fulfill({json:{path,entries}})
+  })
+  await page.request.post('/api/login',{data:{username:'ssh-admin',password:f.admin_password}})
+  await page.goto('/?window=1&machine='+f.target.id+'&lang='+language)
+  const directory=page.locator('.tree-row[title="/nested"]')
+  await directory.click()
+  const group=directory.locator('..').locator(':scope > ul')
+  const more=group.locator(':scope > .tree-more-row button')
+  await expect(more).toBeVisible()
+  const last=group.locator(':scope > [role=treeitem] > .tree-row > .truncate').last()
+  expect(Math.abs((await more.boundingBox())!.x-(await last.boundingBox())!.x)).toBeLessThanOrEqual(1)
+  await more.scrollIntoViewIfNeeded()
+  await page.screenshot({path:`test-results/tree-more-indent-${language}.png`})
+  await more.focus();await page.keyboard.press('Enter')
+  await expect(group.locator(':scope > [role=treeitem]')).toHaveCount(103)
+  await expect(more).toHaveCount(0)
+ })
+}
+
+test('Empty directory text follows child indentation',async({page})=>{
+ const f=JSON.parse(readFileSync('.test-fixture/connection.json','utf8'))
+ await page.route(/\/api\/targets\/[^/]+\/files(?:\?|$)/,async route=>{
+  const body=route.request().postDataJSON()
+  if(body.op!=='list') return route.continue()
+  const path=body.path||'/'
+  await route.fulfill({json:{path,entries:path==='/'?[{name:'empty',path:'/empty',kind:'directory',size:0,modified:''}]:[]}})
+ })
+ await page.request.post('/api/login',{data:{username:'ssh-admin',password:f.admin_password}})
+ await page.goto('/?window=1&machine='+f.target.id)
+ const row=page.locator('.tree-row[title="/empty"]')
+ await row.click()
+ const text=row.locator('..').locator(':scope > ul > .tree-empty')
+ await expect(text).toBeVisible()
+ const x=await text.evaluate(node=>{const range=document.createRange();range.selectNodeContents(node);return range.getBoundingClientRect().x})
+ expect(Math.abs(x-(await row.locator('.truncate').boundingBox())!.x-17)).toBeLessThanOrEqual(1)
 })

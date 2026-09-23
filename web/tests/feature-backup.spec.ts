@@ -26,14 +26,25 @@ test('备份：英文界面与普通用户权限',async({page,browser})=>{
  const created=await page.request.post('/api/users',{data:{username:'feature-backup-reader',password:'reader-password-test',enabled:true,target_ids:[f.target.id],tags:[]}});expect(created.ok()).toBe(true)
  const user=await created.json();const context=await browser.newContext();try{const p=await context.newPage();await p.goto('/?lang=zh-CN');await p.getByLabel('用户名',{exact:true}).fill('feature-backup-reader');await p.getByLabel('登录密码').fill('reader-password-test');await p.getByRole('button',{name:'进入中转台'}).click();await expect(p.getByRole('heading',{name:'SSH 连接',exact:true})).toBeVisible()
  for(const name of ['系统设置','安全密码加密','批量导入机器','备份与恢复','连接诊断','编辑']){await expect(p.getByRole('button',{name,exact:true})).toHaveCount(0)}
+ await p.goto('/?window=1&machine='+encodeURIComponent(f.target.id));await expect(p.locator('.machine-header')).toBeVisible();await p.getByRole('button',{name:'连接诊断',exact:true}).click();const diagnostic=p.getByRole('dialog',{name:'连接诊断'});await expect(diagnostic.getByLabel('诊断账号').locator('option[value^="server:"]')).toHaveCount(0);await diagnostic.getByRole('button',{name:'开始诊断'}).click();await expect(diagnostic).toContainText('身份认证');await expect(diagnostic.getByRole('button',{name:'开始诊断'})).toBeVisible()
  expect((await p.request.post('/api/import/commit',{data:{rows:[]}})).status()).toBe(403)
- expect((await p.request.get('/api/diagnostics/permission-test')).status()).toBe(403)
- expect((await p.request.delete('/api/diagnostics/permission-test',{data:{}})).status()).toBe(403)
+ expect((await p.request.get('/api/diagnostics/permission-test')).status()).toBe(404)
+ expect((await p.request.delete('/api/diagnostics/permission-test',{data:{}})).status()).toBe(404)
  expect((await p.request.put('/api/targets/'+f.target.id,{data:{...f.target,relay_expires_at:'2099-01-01T00:00:00Z'}})).status()).toBe(403)
- expect((await p.request.post('/api/security/master-password',{data:{action:'enable'}})).status()).toBe(403)
+ expect((await p.request.post('/api/security/master-password',{data:{action:'enable'}})).status()).toBe(404)
  expect((await p.request.post('/api/backups',{data:{password:'backup-password-test',admin_password:f.admin_password}})).status()).toBe(403)
  expect((await p.request.post('/api/import/preview',{data:{format:'json',content:'[]'}})).status()).toBe(403)
  expect((await p.request.post('/api/targets/'+f.target.id+'/diagnostics',{data:{connection:'server:default'}})).status()).toBe(403)
+ expect((await p.request.post('/api/targets/not-granted/diagnostics',{data:{connection:'default'}})).status()).toBe(403)
+ const started=await p.request.post('/api/targets/'+f.target.id+'/diagnostics',{data:{connection:'default'}});expect(started.status()).toBe(202)
+ const job=await started.json()
+ expect((await page.request.get('/api/diagnostics/'+job.id)).status()).toBe(404)
+ expect((await page.request.delete('/api/diagnostics/'+job.id,{data:{}})).status()).toBe(404)
+ expect((await p.request.get('/api/diagnostics/'+job.id)).status()).toBe(200)
+ expect((await p.request.delete('/api/diagnostics/'+job.id,{data:{}})).status()).toBe(200)
+ expect((await page.request.put('/api/users/'+user.id,{data:{username:'feature-backup-reader',enabled:true,target_ids:[],tags:[]}})).ok()).toBe(true)
+ expect((await p.request.get('/api/diagnostics/'+job.id)).status()).toBe(403)
+
  }finally{await context.close();await page.request.delete('/api/users/'+user.id,{data:{}})}
 })
 
@@ -45,7 +56,7 @@ test('桌面备份：调用保存桥接、取消与成功后清除密码',async(
   Call:async(method:string,path:string,body:string)=>{const response=await page.request.fetch('/api'+path,{method,data:body?JSON.parse(body):undefined});return {status:response.status(),data:await response.json()}},
   SaveBackup:(data:string)=>{expect(Buffer.from(data,'base64').subarray(0,8).toString()).toBe('SGBACK01');saves++;return accept},
  })
- await page.goto('/');await page.getByLabel('管理员密码',{exact:true}).fill(f.admin_password);await page.getByRole('button',{name:'进入中转台'}).click();await page.getByRole('button',{name:'系统设置'}).click();await page.getByRole('button',{name:'备份与恢复',exact:true}).click()
+ await page.goto('/');await page.getByLabel('管理员密码',{exact:true}).fill(f.admin_password);await page.getByRole('button',{name:'进入中转台'}).click();await page.locator('.menu-trigger').getByText('管理员',{exact:true}).click();await page.getByRole('button',{name:'备份与恢复',exact:true}).click()
  const d=page.getByRole('dialog',{name:'备份与恢复',exact:true})
  for(const accepted of [false,true]){
   accept=accepted;await d.getByLabel('备份验证：管理员密码').fill(f.admin_password);await d.getByLabel('备份密码',{exact:true}).fill('desktop-backup-password');await d.getByLabel('确认备份密码').fill('desktop-backup-password');await d.getByRole('button',{name:'导出加密备份'}).click();await expect(d.getByRole('status')).toContainText(accepted?'已生成加密备份':'已取消');await expect(d.getByLabel('备份密码',{exact:true})).toHaveValue('')

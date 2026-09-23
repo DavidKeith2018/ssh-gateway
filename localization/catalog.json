@@ -241,14 +241,14 @@
   },
   "backend.b2625455830a": {
     "source": "主密码不正确或密钥文件已损坏",
-    "zh-CN": "主密码不正确或密钥文件已损坏",
-    "en": "Incorrect master password or corrupt key file",
+    "zh-CN": "管理员密码不正确或密钥文件已损坏",
+    "en": "Incorrect administrator password or corrupt key file",
     "prefix": false
   },
   "backend.c49431bf9a71": {
     "source": "凭证已锁定，请先输入主密码解锁",
-    "zh-CN": "凭证已锁定，请先输入主密码解锁",
-    "en": "Credentials are locked. Enter the master password to unlock them.",
+    "zh-CN": "凭证已锁定，请先输入管理员密码解锁",
+    "en": "Credentials are locked. Enter the administrator password to unlock them.",
     "prefix": false
   },
   "backend.5e78052526e1": {
@@ -1743,6 +1743,18 @@
     "source": "保存加密备份",
     "zh-CN": "保存加密备份",
     "en": "Save encrypted backup",
+    "prefix": false
+  },
+  "backend.abe1212adc85": {
+    "source": "This file type cannot be previewed. Download it to view.",
+    "zh-CN": "此文件类型暂不支持预览，请下载查看。",
+    "en": "This file type cannot be previewed. Download it to view.",
+    "prefix": false
+  },
+  "backend.e28107d68da7": {
+    "source": "Preview is limited to 32 MiB. Download this file to view.",
+    "zh-CN": "预览最大支持 32 MiB，请下载此文件查看。",
+    "en": "Preview is limited to 32 MiB. Download this file to view.",
     "prefix": false
   }
 }

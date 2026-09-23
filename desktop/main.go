@@ -2,8 +2,7 @@ package main
 
 import (
 	"context"
-	"crypto/sha256"
-	"encoding/hex"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"os"
@@ -133,7 +132,20 @@ func (a *App) Call(method, path, body string) (gateway.DesktopReply, error) {
 	if a.core == nil {
 		return gateway.DesktopReply{}, fmt.Errorf("请先选择可用的数据目录")
 	}
-	return a.core.Call(method, path, body)
+	reply, err := a.core.Call(method, path, body)
+	if err == nil && reply.Status == 200 && method == "POST" && path == "/desktop/password" {
+		if saved, readErr := readRememberedLogin(a.dir); readErr == nil && saved.Username == "ssh-admin" {
+			var input struct {
+				Password string `json:"password"`
+			}
+			if json.Unmarshal([]byte(body), &input) == nil {
+				if writeRememberedLogin(a.dir, saved.Username, input.Password) != nil {
+					_ = forgetRememberedLogin(a.dir)
+				}
+			}
+		}
+	}
+	return reply, err
 }
 func (a *App) SaveSettings(settings gateway.DesktopSettings, confirmed bool) error {
 	a.mu.RLock()
@@ -228,6 +240,12 @@ func runDesktop() {
 	flag.Parse()
 	dir, _ = filepath.Abs(dir)
 	app := newDesktopApp(dir)
+	release, lockErr := acquireMachineInstance()
+	if lockErr != nil {
+		fmt.Fprintln(os.Stderr, lockErr)
+		return
+	}
+	defer release()
 	err = app.application.Run()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
@@ -237,8 +255,7 @@ func runDesktop() {
 
 func newDesktopApp(dir string) *App {
 	app := &App{dir: dir}
-	hash := sha256.Sum256([]byte(dir))
-	unique := hex.EncodeToString(hash[:16])
+	const unique = "ssh-gateway-desktop"
 	app.application = application.New(application.Options{
 		MarshalError: localization.MarshalError,
 		Name:         "SSH Gateway", Icon: gateway.DesktopIcon(),

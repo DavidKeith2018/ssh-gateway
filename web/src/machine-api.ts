@@ -40,7 +40,7 @@ export class MachineError extends Error {
 }
 export async function machineAPI<T>(
   target: string,
-  operation: 'files' | 'notes' | 'resources' | 'hardware',
+  operation: 'files' | 'notes' | 'favorites' | 'resources' | 'hardware',
   body?: unknown,
   signal?: AbortSignal,
   shared?: string,
@@ -64,10 +64,10 @@ export async function machineAPI<T>(
         `/api/targets/${encodeURIComponent(target)}/${operation}${connectionQuery(target, '?', shared)}`,
         {
           method:
-            operation === 'files' || operation === 'notes' ? 'POST' : 'GET',
+            operation === 'files' || operation === 'notes' || operation === 'favorites' ? 'POST' : 'GET',
           headers: { 'Content-Type': 'application/json' },
           body:
-            operation === 'files' || operation === 'notes'
+            operation === 'files' || operation === 'notes' || operation === 'favorites'
               ? JSON.stringify(body)
               : undefined,
           signal,

@@ -12,6 +12,10 @@ import * as gateway$0 from "../ssh-gateway/models.js";
 // @ts-ignore: Unused imports
 import * as updater$0 from "../ssh-gateway/updater/models.js";
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore: Unused imports
+import * as $models from "./models.js";
+
 export function AckTerminal(id: string): $CancellablePromise<void> {
     return $Call.ByName("main.App.AckTerminal", id);
 }
@@ -48,6 +52,10 @@ export function ConfirmQuit(): $CancellablePromise<void> {
     return $Call.ByName("main.App.ConfirmQuit");
 }
 
+export function ForgetRememberedLogin(): $CancellablePromise<void> {
+    return $Call.ByName("main.App.ForgetRememberedLogin");
+}
+
 /**
  * FrontendReady 在退出事件订阅完成后握手，避免启动期间丢失退出请求。
  */
@@ -75,14 +83,14 @@ export function OpenExternalURL(address: string): $CancellablePromise<void> {
 }
 
 /**
- * OpenMachineConnectionWindow 用所选账号打开独立工作页。
+ * OpenMachineConnectionWindow preserves the selected account in the new window.
  */
 export function OpenMachineConnectionWindow(target: string, selection: string): $CancellablePromise<void> {
     return $Call.ByName("main.App.OpenMachineConnectionWindow", target, selection);
 }
 
 /**
- * OpenMachineWindow 在系统浏览器中打开独立工作页，沿用桌面登录。
+ * OpenMachineWindow opens WebSSH in a separate application window.
  */
 export function OpenMachineWindow(target: string): $CancellablePromise<void> {
     return $Call.ByName("main.App.OpenMachineWindow", target);
@@ -100,11 +108,19 @@ export function Quit(): $CancellablePromise<void> {
     return $Call.ByName("main.App.Quit");
 }
 
+export function RememberedLogin(): $CancellablePromise<$models.RememberedLogin> {
+    return $Call.ByName("main.App.RememberedLogin");
+}
+
 /**
  * SaveBackup 只保存已经加密的备份；路径由系统保存窗口选择。
  */
 export function SaveBackup(encoded: string): $CancellablePromise<boolean> {
     return $Call.ByName("main.App.SaveBackup", encoded);
+}
+
+export function SaveRememberedLogin(username: string, password: string): $CancellablePromise<void> {
+    return $Call.ByName("main.App.SaveRememberedLogin", username, password);
 }
 
 export function SaveSettings(settings: gateway$0.DesktopSettings, confirmed: boolean): $CancellablePromise<void> {

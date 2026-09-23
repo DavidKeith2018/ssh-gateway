@@ -68,4 +68,4 @@ npx playwright install chromium
 npm run demo:screenshots
 ```
 
-The script uses an isolated OpenSSH container, executes real commands, and does not mount host directories. Screenshots are written to `site/screenshots/`; the container is cleaned up afterward. Screenshots illustrate the product and are not a claim that every production or native interaction has been tested.
+The script uses an isolated OpenSSH container, executes real commands, and does not mount host directories. The gallery contains six views in the light theme. Screenshots replace the previous set in `site/screenshots/`; the container is cleaned up afterward. Screenshots illustrate the product and are not a claim that every production or native interaction has been tested.

@@ -48,7 +48,7 @@ onBeforeUnmount(() => { stopped = true; clearInterval(timer) })
 <template>
   <section class="program-update" :aria-label="t('text.ec5658d4a5d2')">
     <div class="version-status" :class="{ 'sidebar-version': inline }">
-      <button class="current-version" :disabled="!enabled" :aria-label="display(t('text.1b9e9d2bae45', [currentVersion || t('text.4d8c1c5b4283')]))" :title="display(enabled ? t('text.9695df23e7f5') : t('text.9ff53bd778b6'))" @click="show"><template v-if="inline"><span class="version-label">{{ t('text.ec5658d4a5d2') }}</span><span class="version-number">{{ display(currentVersion ? `v${currentVersion}` : t('text.4d8c1c5b4283')) }}</span></template><template v-else>{{ t('text.837bc9576721') }} {{ display(currentVersion || t('text.4d8c1c5b4283')) }}</template></button>
+      <button class="current-version" :disabled="!enabled" :aria-label="display(t('text.1b9e9d2bae45', [currentVersion || t('text.4d8c1c5b4283')]))" :title="display(enabled ? t('text.9695df23e7f5') : t('text.9ff53bd778b6'))" @click="show"><template v-if="inline"><span class="version-label">{{ t('text.ec5658d4a5d2') }}</span><span class="version-number" :title="currentVersion ? `v${currentVersion}` : ''">{{ display(currentVersion ? `v${currentVersion}` : t('text.4d8c1c5b4283')) }}</span></template><template v-else>{{ t('text.837bc9576721') }} {{ display(currentVersion || t('text.4d8c1c5b4283')) }}</template></button>
       <button v-if="enabled && info?.available" class="new-version" @click="dialog?.showModal()">{{ t('text.ac217e4d1ca4') }} {{ display(info.version) }}</button>
     </div>
     <dialog ref="dialog" class="small-dialog">
@@ -75,9 +75,9 @@ onBeforeUnmount(() => { stopped = true; clearInterval(timer) })
 .version-status button:disabled { opacity: 1; cursor: default; }
 .sidebar-version { position: static; margin-top: 16px; padding-top: 12px; border-top: 1px solid #82958c40; max-width: 100%; flex-direction: column; align-items: flex-start; gap: 9px; }
 .sidebar-version button { padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; color: inherit; font-size: 11px; text-align: left; }
-.sidebar-version .current-version { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; }
-.version-label { font-size: 11px; opacity: .8; }
-.version-number { padding: 2px 7px; border: 1px solid #82958c30; border-radius: 5px; background: #82958c14; font-family: ui-monospace, monospace; font-size: 11px; font-weight: 600; }
+.sidebar-version .current-version { display: flex; flex-direction: column; align-items: flex-start; gap: 5px; width: 100%; min-width: 0; }
+.version-label { font-size: 11px; opacity: .8; white-space: nowrap; flex-shrink: 0; }
+.version-number { display: block; max-width: 100%; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 2px 7px; border: 1px solid #82958c30; border-radius: 5px; background: #82958c14; font-family: ui-monospace, monospace; font-size: 11px; font-weight: 600; }
 .current-version:hover .version-number { border-color: #82958c80; background: #82958c25; }
 .sidebar-version .new-version { color: var(--accent, #16887a); }
 .sidebar-version .new-version:hover { text-decoration: underline; text-underline-offset: 3px; }

@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test'
 import { readFileSync } from 'node:fs'
 
-test('列表选择账号后直接复制，来源独立列查看，右侧笔记保存', async ({ page, context }) => {
+test('列表选择账号后直接复制，来源位于账号上方，右侧笔记保存', async ({ page, context }) => {
  const fixture = JSON.parse(readFileSync('.test-fixture/connection.json', 'utf8'))
  await context.grantPermissions(['clipboard-read', 'clipboard-write'])
  await page.goto('/')
@@ -13,7 +13,7 @@ test('列表选择账号后直接复制，来源独立列查看，右侧笔记�
  await expect(row.locator('.target-address')).not.toContainText('@')
  const source = (await row.locator('.source-preview').boundingBox())!
  const account = (await choose.boundingBox())!
- expect(source.x + source.width).toBeLessThan(account.x)
+ expect(source.y + source.height).toBeLessThanOrEqual(account.y)
  for (const [selection, label, password, other] of [
    ['server:default', '复制服务器凭证', fixture.target.target_password, fixture.target.relay_password],
    ['default', '复制连接信息', fixture.target.relay_password, fixture.target.target_password],
@@ -94,7 +94,7 @@ test('来源列表显示全部 IP，长列表可滚动且关闭按钮可见', as
  try {
    await page.reload()
    const row=page.getByRole('row').filter({hasText:'来源列表验收'})
-   await expect(row.locator('.source-preview')).toContainText('40 项')
+   await expect(row.locator('.source-preview')).toHaveText(sources[0])
    await row.getByRole('button',{name:'来源列表验收 查看允许来源 IP'}).click()
    const dialog=page.getByRole('dialog',{name:'允许来源 IP',exact:true})
    const content = dialog.getByRole('textbox', {name:'全部允许来源 IP'})

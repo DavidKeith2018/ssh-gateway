@@ -11,6 +11,8 @@ const props = defineProps<{
   loading: Set<string>
   depth?: number
 }>()
+// Match child filenames: row margin + child indent + toggle/icon widths and gaps.
+const childTextIndent = computed(() => `${7 + 8 + ((props.depth || 0) + 1) * 17 + 14 + 6 + 18 + 6}px`)
 // 大目录分批呈现，收藏定位的节点始终包含在可见批次中。
 const visibleLimit = ref(100)
 const shownChildren = computed(() => {
@@ -81,7 +83,7 @@ const emit = defineEmits<{
       v-if="entry.kind === 'directory' && expanded.has(entry.path)"
       role="group"
     >
-      <li v-if="loading.has(entry.path)" class="tree-loading" :style="{ paddingLeft: `${59 + (depth || 0) * 17}px` }" role="none">{{ t('text.21bd738e0d71') }}</li>
+      <li v-if="loading.has(entry.path)" class="tree-loading" :style="{ paddingLeft: childTextIndent }" role="none">{{ t('text.21bd738e0d71') }}</li>
       <FileTreeNode
         v-for="child in shownChildren"
         :key="child.path"
@@ -96,7 +98,7 @@ const emit = defineEmits<{
         @toggle="emit('toggle', $event)"
         @menu="(event, item) => emit('menu', event, item)"
       />
-      <li v-if="remaining > 0" role="none">
+      <li v-if="remaining > 0" class="tree-more-row" :style="{ paddingLeft: childTextIndent }" role="none">
         <button class="tree-more" @click="visibleLimit += 100">
           {{ t('text.51a5f415b032') }} {{ display(remaining) }} {{ t('text.1f41b36769ce') }}
         </button>
@@ -104,7 +106,7 @@ const emit = defineEmits<{
       <li
         v-if="!loading.has(entry.path) && !childrenByPath[entry.path]?.length"
         class="tree-empty"
-        :style="{ paddingLeft: `${59 + (depth || 0) * 17}px` }"
+        :style="{ paddingLeft: childTextIndent }"
       >
         {{ t('text.3ea0e6e41518') }}
       </li>

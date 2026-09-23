@@ -32,6 +32,7 @@ test('紧凑 SSH 编辑器：自动编号、标签、多账号绑定、自动凭
   const root = editor.getByRole('region', { name: '目标账号 2', exact: true })
   await root.getByLabel('目标用户名', { exact: true }).fill('root')
   await root.getByRole('combobox', { name: '认证方式', exact: true }).selectOption('private_key')
+  await root.getByRole('button', { name: '显示私钥', exact: true }).click()
   await root.getByLabel('目标私钥', { exact: true }).fill(target.logins[1].target_private_key)
   await root.getByLabel('私钥密码', { exact: true }).fill(target.logins[1].target_key_passphrase)
   await root.getByRole('radio', { name: '将 root 设为默认' }).check()

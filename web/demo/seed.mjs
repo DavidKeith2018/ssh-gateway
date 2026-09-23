@@ -27,7 +27,7 @@ export async function seedDemo(api, fixture) {
   for (let i = 0; i < 8; i++) await call('/global-ips', 'PUT', { ip: `198.51.100.${20 + i}`, expires_at: new Date(Date.now() + (i + 1) * 86400000).toISOString() });
   const shortcuts = [['查看系统负载', 'uptime'], ['磁盘使用情况', 'df -h'], ['内存使用情况', 'free -h'], ['最近服务日志', 'journalctl -u app -n 50'], ['容器状态', 'docker ps'], ['监听端口', 'ss -lnt'], ['当前登录用户', 'who'], ['系统版本', 'cat /etc/os-release'], ['服务健康检查', 'curl -I http://127.0.0.1:8080'], ['进程概览', 'ps aux'], ['应用目录', 'ls -lah /srv/app'], ['网络地址', 'ip addr']];
   for (const [i, [name, command]] of shortcuts.entries()) await call('/shortcuts', 'POST', { name, command, targetId: i < 6 ? '*' : i < 9 ? primary.id : '', tags: i >= 9 ? ['生产'] : [] });
-  for (let i = 0; i < 12; i++) await call('/mappings', 'POST', { target_id: mapping.id, name: `${['应用预览', '数据库隧道', '监控面板', '回调调试'][i % 4]} ${i + 1}`, direction: i % 2 ? 'reverse' : 'local', service_host: '127.0.0.1', service_port: [8080, 5432, 9090, 3000][i % 4], listen_port: 24000 + i, scope: i % 3 ? 'loopback' : 'shared', auto_start: false });
+  for (let i = 0; i < 12; i++) await call('/mappings', 'POST', { target_id: mapping.id, name: `${['应用预览', '数据库隧道', '监控面板', '回调调试'][i % 4]} ${i + 1}`, direction: i % 2 ? 'reverse' : 'local', service_host: '127.0.0.1', service_port: [8080, 5432, 9090, 3000][i % 4], listen_port: 24000 + i, scope: i % 2 && i % 3 === 0 ? 'shared' : 'loopback', auto_start: false });
   for (const target of targets) {
     const path = `/targets/${target.id}/notes`;
     const note = await call(path, 'POST', { op: 'read' });
@@ -42,5 +42,5 @@ export async function seedDemo(api, fixture) {
     const file = await call(filesPath, 'POST', { op: 'read', path });
     await call(filesPath, 'POST', { op: 'write', path, content, version: file.version });
   }
-  return { primary, multi, mapping, counts: { targets: 36, accounts: 8, mappings: 12, globalIPs: 8, shortcuts: 12, notes: 36, files: 6 } };
+  return { primary, multi, mapping, counts: { targets: 36, accounts: 8, mappings: 12, globalIPs: 8, shortcuts: (await call('/shortcuts?page_size=100')).total, notes: 36, files: 6 } };
 }

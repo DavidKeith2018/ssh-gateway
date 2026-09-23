@@ -224,23 +224,10 @@ func TestMasterPasswordRejectsStaleWriterAndMissingKey(t *testing.T) {
 
 func TestMasterPasswordWebAuthorization(t *testing.T) {
 	f := newWebFixture(t)
-	body := map[string]string{"action": "enable", "admin_password": testAdminPassword, "password": "first-master-password"}
-	requireStatus(t, f, "POST", "/api/security/master-password", body, 401)
 	f.login(t)
-	body["admin_password"] = "wrong-admin-password"
-	requireStatus(t, f, "POST", "/api/security/master-password", body, 403)
-	body["admin_password"] = testAdminPassword
-	requireStatus(t, f, "POST", "/api/security/master-password", body, 200)
-	body["action"], body["current"], body["password"] = "change", "wrong-master-password", "second-master-password"
-	requireStatus(t, f, "POST", "/api/security/master-password", body, 400)
-	body["current"] = "first-master-password"
-	requireStatus(t, f, "POST", "/api/security/master-password", body, 200)
-	addTestAccount(t, f.store, accountInput{Username: "vault-user", Enabled: true})
-	userLogin(t, f, "vault-user")
-	requireStatus(t, f, "POST", "/api/security/master-password", body, 403)
-	f.login(t)
-	body["action"], body["current"], body["password"] = "disable", "second-master-password", ""
-	requireStatus(t, f, "POST", "/api/security/master-password", body, 200)
+	for _, action := range []string{"enable", "change", "disable"} {
+		requireStatus(t, f, "POST", "/api/security/master-password", map[string]string{"action": action, "admin_password": testAdminPassword}, 404)
+	}
 }
 
 func TestMasterPasswordLockedWebAndRateLimit(t *testing.T) {
@@ -299,8 +286,8 @@ func TestMasterPasswordLockedWebAndRateLimit(t *testing.T) {
 	if code := call("/api/unlock", `{"password":"first-master-password"}`, "127.0.0.1:10", ""); code != 429 {
 		t.Fatal("未限制主密码重试", code)
 	}
-	if err = s.SetAdminPassword(context.Background(), "changed-admin-password"); err != nil {
-		t.Fatal(err)
+	if err = s.SetAdminPassword(context.Background(), "changed-admin-password"); err != ErrMasterLocked {
+		t.Fatalf("locked password reset: %v", err)
 	}
 	if !s.MasterPasswordStatus().Locked {
 		t.Fatal("重置管理员密码解锁了凭证")
@@ -322,7 +309,7 @@ func TestMasterPasswordDesktopSetupAndRestart(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	reply := desktopCall(t, d, "POST", "/desktop/setup", map[string]string{"password": testAdminPassword, "master_password": "desktop-master-password"})
+	reply := desktopCall(t, d, "POST", "/desktop/setup", map[string]any{"password": testAdminPassword, "encryption": false})
 	if reply.Status != 200 || !d.store.MasterPasswordStatus().Enabled {
 		t.Fatal("首次设置未启用保护")
 	}
@@ -339,7 +326,7 @@ func TestMasterPasswordDesktopSetupAndRestart(t *testing.T) {
 	if reply.Status != 401 || d.Info().Listen != "" {
 		t.Fatal("错误主密码启动了监听")
 	}
-	reply = desktopCall(t, d, "POST", "/unlock", map[string]string{"password": "desktop-master-password"})
+	reply = desktopCall(t, d, "POST", "/unlock", map[string]string{"password": testAdminPassword})
 	if reply.Status != 200 || d.Info().Listen == "" {
 		t.Fatal("解锁后未启动监听")
 	}

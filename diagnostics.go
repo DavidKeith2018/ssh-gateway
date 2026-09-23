@@ -27,6 +27,8 @@ type DiagnosticReport struct {
 	Location string           `json:"location"`
 }
 type diagnosticJob struct {
+	owner   string
+	target  string
 	mu      sync.Mutex
 	report  DiagnosticReport
 	cancel  context.CancelFunc
@@ -69,9 +71,13 @@ func (web *Web) startDiagnostic(w http.ResponseWriter, r *http.Request) {
 		apiError(w, 400, err.Error())
 		return
 	}
+	if strings.HasPrefix(in.Connection, "server:") && !web.isAdmin(r) {
+		apiError(w, 403, "仅管理员可操作")
+		return
+	}
 	id := uuid.NewString()
 	ctx, cancel := context.WithTimeout(web.ctx, 30*time.Second)
-	job := &diagnosticJob{report: DiagnosticReport{Steps: []DiagnosticStep{}, Location: "gateway"}, cancel: cancel, expires: time.Now().Add(5 * time.Minute)}
+	job := &diagnosticJob{owner: web.sessionID(r), target: r.PathValue("id"), report: DiagnosticReport{Steps: []DiagnosticStep{}, Location: "gateway"}, cancel: cancel, expires: time.Now().Add(5 * time.Minute)}
 	web.mu.Lock()
 	if web.diagnostics == nil {
 		web.diagnostics = map[string]*diagnosticJob{}
@@ -110,8 +116,13 @@ func (web *Web) diagnosticResult(w http.ResponseWriter, r *http.Request) {
 	web.mu.Lock()
 	job := web.diagnostics[r.PathValue("job")]
 	web.mu.Unlock()
-	if job == nil {
+	if job == nil || job.owner != web.sessionID(r) {
 		apiError(w, 404, "诊断任务不存在")
+		return
+	}
+	if !web.canAccess(r, job.target) {
+		job.cancel()
+		apiError(w, 403, "没有此机器的访问权限")
 		return
 	}
 	if r.Method == "DELETE" {

@@ -79,3 +79,11 @@ test('普通用户的监听端口仅显示文本', async ({ page }) => {
   await expect(page.getByRole('button', { name: '中转访问设置', exact: true })).toHaveCount(0)
   await expect(page.getByRole('dialog', { name: '中转访问设置', includeHidden: true })).toHaveCount(0)
 })
+
+// Keep navigation visible for these workflows; default collapse is covered by compact-ui.spec.ts.
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => {
+    if (localStorage.getItem('ssh-gateway:sidebar-collapsed') === null)
+      localStorage.setItem('ssh-gateway:sidebar-collapsed', 'false')
+  })
+})

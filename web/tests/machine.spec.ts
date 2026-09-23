@@ -7,6 +7,15 @@ async function leaveMachine(page: Page) {
   await expect(page.getByRole('heading', { name: 'SSH 连接', exact: true })).toBeVisible()
 }
 
+// Server-side favorites survive browser contexts; isolate each test's saved state.
+test.beforeEach(async ({ request }) => {
+  const fixture = JSON.parse(readFileSync('.test-fixture/connection.json', 'utf8'))
+  await request.post('/api/login', {data:{username:'ssh-admin',password:fixture.admin_password}})
+  const endpoint = `/api/targets/${fixture.target.id}/favorites`
+  const entries = await (await request.post(endpoint, {data:{op:'read'}})).json()
+  expect((await request.post(endpoint, {data:{op:'remove',entries}})).ok()).toBe(true)
+})
+
 test('机器页：收藏树、Monaco 多文档、传输、多终端、主题与离开', async ({
   page,
 }) => {
@@ -953,6 +962,8 @@ test('右侧资源显示三个实时值', async ({ page }) => {
   await expect(resources.locator('dd').nth(1)).toHaveText('37.5%')
   await expect(resources.locator('dd').nth(2)).toHaveText('42.0%')
   await expect(resources.locator('svg')).toHaveCount(0)
+  expect((await resources.boundingBox())!.height).toBeLessThanOrEqual(110)
+  expect(await resources.locator('dd').first().evaluate(n=>parseFloat(getComputedStyle(n).fontSize))).toBeLessThanOrEqual(13)
 })
 
 test('机器标题显示 IP、多终端会话隔离及关闭即断开', async ({ page }) => {
@@ -996,4 +1007,12 @@ test('机器标题显示 IP、多终端会话隔离及关闭即断开', async ({
   await expect.poll(() => closed[0]).toBe(true)
   await expect(bar.getByRole('tab')).toHaveCount(0)
   await expect(machine.locator('.machine-terminal')).toHaveCount(0)
+})
+
+// Keep navigation visible for these workflows; default collapse is covered by compact-ui.spec.ts.
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => {
+    if (localStorage.getItem('ssh-gateway:sidebar-collapsed') === null)
+      localStorage.setItem('ssh-gateway:sidebar-collapsed', 'false')
+  })
 })

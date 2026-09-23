@@ -1,0 +1,6 @@
+# Generated bundles contain intentional whitespace inside embedded strings.
+web/dist/** linguist-generated=true
+web/dist/assets/*.js -whitespace
+
+# PDF cross-reference records contain significant trailing spaces.
+*.pdf binary

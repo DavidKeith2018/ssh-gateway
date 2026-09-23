@@ -1,7 +1,6 @@
 package gateway
 
 import (
-	"bytes"
 	"crypto/ed25519"
 	"crypto/rand"
 	"encoding/pem"
@@ -65,7 +64,7 @@ func loadMasterKey(dir string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	if len(key) != 32 && (len(key) != wrappedMasterKeySize || !bytes.Equal(key[:8], masterPasswordMagic)) {
+	if len(key) != 32 && !validWrappedMasterKey(key) {
 		return nil, fmt.Errorf("master.key 损坏或版本不受支持，请恢复原密钥")
 	}
 	return key, nil

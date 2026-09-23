@@ -4,8 +4,6 @@ import (
 	"net"
 	"net/http"
 	"time"
-
-	"golang.org/x/crypto/bcrypt"
 )
 
 func (web *Web) masterPasswordRoutes(mux *http.ServeMux) {
@@ -13,7 +11,6 @@ func (web *Web) masterPasswordRoutes(mux *http.ServeMux) {
 		jsonResponse(w, 200, web.store.MasterPasswordStatus())
 	})
 	mux.HandleFunc("POST /api/unlock", web.unlockCredentials)
-	mux.HandleFunc("POST /api/security/master-password", web.administrator(web.changeMasterPassword))
 }
 
 // 主密码只允许通过 HTTPS 或回环连接传输；桌面桥接使用回环请求。
@@ -68,52 +65,5 @@ func (web *Web) unlockCredentials(w http.ResponseWriter, r *http.Request) {
 		apiError(w, 401, err.Error())
 		return
 	}
-	jsonResponse(w, 200, web.store.MasterPasswordStatus())
-}
-
-func (web *Web) changeMasterPassword(w http.ResponseWriter, r *http.Request) {
-	var in struct {
-		Action        string `json:"action"`
-		AdminPassword string `json:"admin_password"`
-		Current       string `json:"current"`
-		Password      string `json:"password"`
-	}
-	if err := decodeJSON(w, r, &in); err != nil {
-		apiError(w, 400, err.Error())
-		return
-	}
-	if in.Action != "enable" && in.Action != "change" && in.Action != "disable" {
-		apiError(w, 400, "主密码操作无效")
-		return
-	}
-	if in.Action == "disable" && in.Password != "" {
-		apiError(w, 400, "关闭保护时不能同时设置新主密码")
-		return
-	}
-	if in.Action != "disable" {
-		if err := validateMasterPassword(in.Password); err != nil {
-			apiError(w, 400, err.Error())
-			return
-		}
-	}
-	if !web.allowMasterPasswordRequest(w, r) {
-		return
-	}
-	defer func() { <-web.masterSlots }()
-	hash, err := web.store.adminHash(r.Context())
-	if err != nil || bcrypt.CompareHashAndPassword(hash, []byte(in.AdminPassword)) != nil {
-		apiError(w, 403, "管理员密码不正确")
-		return
-	}
-	enabled := web.store.MasterPasswordStatus().Enabled
-	if (in.Action == "enable") == enabled {
-		apiError(w, 409, "主密码状态已改变，请重新打开安全设置")
-		return
-	}
-	if err := web.store.ChangeMasterPassword(in.Current, in.Password); err != nil {
-		apiError(w, 400, err.Error())
-		return
-	}
-	web.store.logEvent("", sourceIP(r), "主密码保护设置已更新")
 	jsonResponse(w, 200, web.store.MasterPasswordStatus())
 }

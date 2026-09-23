@@ -242,19 +242,13 @@ func (d *Desktop) Call(method, path, body string) (DesktopReply, error) {
 			return DesktopReply{423, json.RawMessage(`{"error":"请先输入主密码解锁"}`)}, nil
 		}
 		var in struct {
-			Password       string `json:"password"`
-			MasterPassword string `json:"master_password"`
+			Password string `json:"password"`
 		}
 		if err := json.Unmarshal([]byte(body), &in); err != nil {
 			return DesktopReply{}, err
 		}
 		if len(in.Password) < 12 || len(in.Password) > 72 {
 			return DesktopReply{}, fmt.Errorf("管理员密码要求 12～72 字节")
-		}
-		if in.MasterPassword != "" {
-			if err := validateMasterPassword(in.MasterPassword); err != nil {
-				return DesktopReply{}, err
-			}
 		}
 		hash, err := bcrypt.GenerateFromPassword([]byte(in.Password), bcrypt.DefaultCost)
 		if err != nil {
@@ -267,8 +261,8 @@ func (d *Desktop) Call(method, path, body string) (DesktopReply, error) {
 		if n, _ := result.RowsAffected(); n != 1 {
 			return DesktopReply{}, fmt.Errorf("管理员已设置，请登录")
 		}
-		if in.MasterPassword != "" {
-			if err := d.store.ChangeMasterPassword("", in.MasterPassword); err != nil {
+		{
+			if err := d.store.SetCredentialProtection(d.ctx, in.Password, true); err != nil {
 				// 只有本次新建的管理员记录才可回滚，避免失败后首次设置无法重试。
 				_, rollbackErr := d.store.db.Exec(`DELETE FROM settings WHERE name='admin_password' AND value=?`, hash)
 				if rollbackErr != nil {

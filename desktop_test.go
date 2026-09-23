@@ -83,8 +83,11 @@ func TestDesktopSetupLockSettingsAndRestart(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer next.Close()
-	if next.Info().NeedsSetup || next.Info().Settings.Port != port || next.Info().Listen == "" {
+	if next.Info().NeedsSetup || next.Info().Settings.Port != port || next.Info().Listen != "" {
 		t.Fatal("重启丢失配置或未释放端口")
+	}
+	if reply := desktopCall(t, next, "POST", "/unlock", map[string]string{"password": testAdminPassword}); reply.Status != 200 || next.Info().Listen == "" {
+		t.Fatal("unlock did not start listener")
 	}
 }
 

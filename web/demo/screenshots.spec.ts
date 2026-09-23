@@ -1,7 +1,6 @@
 import { test as base, expect } from '@playwright/test'
-import { readFileSync, writeFileSync, mkdirSync, cpSync } from 'node:fs'
+import { readFileSync, writeFileSync, mkdirSync, cpSync, rmSync } from 'node:fs'
 import { seedDemo } from './seed.mjs'
-import { createHash } from 'node:crypto'
 import { startDemoSSH } from './ssh-server.mjs'
 
 const test = base.extend<{ sshTarget: Awaited<ReturnType<typeof startDemoSSH>> }>({
@@ -11,7 +10,7 @@ const test = base.extend<{ sshTarget: Awaited<ReturnType<typeof startDemoSSH>> }
   }, { timeout: 660_000 }],
 })
 
-test('演示数据与各功能实拍', async ({ page, request, browser, sshTarget }) => {
+test('演示数据与各功能实拍', async ({ page, request, sshTarget }) => {
   page.setDefaultTimeout(12_000)
   const fixture = JSON.parse(readFileSync('.test-fixture/demo.json', 'utf8'))
   fixture.target = { ...fixture.target, ...sshTarget }
@@ -22,16 +21,18 @@ test('演示数据与各功能实拍', async ({ page, request, browser, sshTarge
   const errors: string[] = []
   page.on('pageerror', error => errors.push(error.message))
   const output = 'test-results/demo-screenshots'
+  rmSync(output, { recursive: true, force: true })
   mkdirSync(output, { recursive: true })
   const shots: string[] = []
   async function shot(name: string) {
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'light')
     await page.evaluate(() => document.fonts.ready)
     await page.screenshot({ path: `${output}/${name}.png`, animations: 'disabled' })
     shots.push(name)
   }
-  await page.goto('/')
+  await page.addInitScript(() => localStorage.setItem('ssh-gateway:theme', 'light'))
+  await page.goto('/?lang=zh-CN')
   await expect(page.getByLabel('管理员密码')).toBeVisible()
-  await shot('login')
   await page.getByLabel('管理员密码').fill(fixture.admin_password)
   await page.getByRole('button', { name: '进入中转台' }).click()
   const row = () => page.getByRole('row').filter({ hasText: demo.primary.name })
@@ -50,7 +51,6 @@ test('演示数据与各功能实拍', async ({ page, request, browser, sshTarge
     await page.locator('.content').getByLabel('筛选机器标签').selectOption('')
     await row().getByRole('button', { name: '编辑', exact: true }).click()
     await expect(page.getByLabel('名称', { exact: true })).toHaveValue(demo.primary.name)
-    await shot('connection-editor')
     await page.keyboard.press('Escape')
     await page.getByRole('textbox', { name: '搜索连接' }).fill('多账号堡垒机')
     await page.getByRole('row').filter({ hasText: demo.multi.name }).getByRole('button', { name: '编辑', exact: true }).click()
@@ -58,54 +58,14 @@ test('演示数据与各功能实拍', async ({ page, request, browser, sshTarge
     await page.keyboard.press('Escape')
     await page.getByRole('textbox', { name: '搜索连接' }).fill('')
   })
-  await test.step('来源授权、笔记、诊断和快捷命令', async () => {
-    await page.getByRole('button', { name: '全局 IP 白名单', exact: true }).click()
-    await expect(page.getByRole('dialog').locator('tbody tr:visible')).toHaveCount(8)
-    await shot('source-access'); await page.keyboard.press('Escape')
-    await row().getByRole('button', { name: '笔记', exact: true }).click()
-    await expect(page.getByRole('dialog').locator('textarea')).toHaveValue(/平台工程/)
-    await shot('notes'); await page.keyboard.press('Escape')
-    await row().getByRole('button', { name: '连接诊断' }).click()
-    const diagnostic = page.getByRole('dialog', { name: '连接诊断' })
-    await diagnostic.getByLabel('诊断账号').selectOption('server:default')
-    await diagnostic.getByRole('button', { name: '开始诊断' }).click()
-    await expect(diagnostic.locator('li').filter({ hasText: '身份认证' })).toContainText('通过')
-    await shot('diagnostics'); await page.keyboard.press('Escape')
-    await page.getByRole('button', { name: '快捷指令', exact: true }).click()
-    await expect(page.getByRole('dialog')).toContainText('查看系统负载')
-    await shot('shortcuts'); await page.keyboard.press('Escape')
-  })
   await test.step('映射和账号授权', async () => {
     await page.locator('.nav-item').filter({ hasText: '端口映射' }).click()
     await expect(page.getByRole('region', { name: '端口映射总览' }).locator('tbody tr:visible')).toHaveCount(12)
     await shot('mappings')
-    await page.getByRole('button', { name: '新增映射' }).click()
-    await page.getByLabel('所属服务器').selectOption(demo.mapping.id)
-    await page.getByRole('dialog', { name: '端口映射配置' }).getByLabel('名称', { exact: true }).fill('应用回调调试')
-    await page.locator('input[type=radio][value=reverse]').check()
-    await shot('mapping-editor'); await page.keyboard.press('Escape')
     await page.getByRole('button', { name: '帐号管理' }).click()
     await expect(page.locator('tbody tr:visible')).toHaveCount(8)
     await shot('accounts')
-    await page.getByRole('row').filter({ hasText: 'demo-reader' }).getByRole('button', { name: '编辑 / 重置密码', exact: true }).click()
-    await shot('account-permissions'); await page.keyboard.press('Escape')
     await page.locator('.nav-item').filter({ hasText: 'SSH 连接' }).click()
-  })
-  await test.step('导入、安全、备份、中转入口和版本', async () => {
-    for (const [title, name] of [['批量导入机器', 'import'], ['安全密码加密', 'security'], ['备份与恢复', 'backup']]) {
-      await page.getByRole('button', { name: '系统设置', exact: true }).click()
-      await page.getByRole('button', { name: title, exact: true }).click()
-      await expect(page.getByRole('dialog')).toBeVisible()
-      if (name === 'security') await expect(page.locator('.security-dialog .primary')).toBeEnabled()
-      if (name === 'import') await page.getByLabel('配置内容', { exact: true }).fill('Host staging-api\n  HostName 192.0.2.80\n  User deploy\n  Port 22\n\nHost staging-worker\n  HostName 192.0.2.81\n  User deploy\n  Port 22')
-      await shot(name); await page.keyboard.press('Escape')
-    }
-    await page.getByRole('button', { name: '中转访问设置', exact: true }).click()
-    await expect(page.getByRole('dialog').locator('button.primary')).toBeEnabled()
-    await shot('relay-settings'); await page.keyboard.press('Escape')
-    await page.locator('.current-version').click()
-    await expect(page.getByRole('dialog')).toContainText('暂未配置更新来源')
-    await shot('version'); await page.keyboard.press('Escape')
   })
   await test.step('真实 SSH 终端、文件编辑、资源和主题', async () => {
     const popup = page.waitForEvent('popup')
@@ -117,6 +77,7 @@ test('演示数据与各功能实拍', async ({ page, request, browser, sshTarge
     const machine = page.getByRole('main', { name: '终端机器页面' })
     await expect(machine.locator('.terminal-tab.active i.online')).toBeVisible()
     await machine.getByRole('button', { name: '定位家目录' }).click()
+    await machine.getByRole('tree').getByText('compose.yaml', { exact: true }).dblclick()
     await machine.getByRole('tree').getByText('app.yaml', { exact: true }).dblclick()
     await expect(machine.locator('.view-lines')).toContainText('gateway-demo')
     async function runCommand(command: string, result: string) {
@@ -144,51 +105,16 @@ test('演示数据与各功能实拍', async ({ page, request, browser, sshTarge
     await machine.getByRole('menuitem', { name: '加入收藏' }).click()
     await showSystemTree()
     await shot('workspace')
-    await machine.getByRole('button', { name: '定位家目录' }).click()
-    await tree.getByText('app.yaml', { exact: true }).click({ button: 'right' })
-    await machine.getByRole('menuitem', { name: '上传文件到此目录' }).click()
-    await machine.locator('input[type=file]').setInputFiles({ name: 'handover.txt', mimeType: 'text/plain', buffer: Buffer.from('演示交接文件：传输验证通过。\n') })
-    await expect(tree.getByText('handover.txt', { exact: true })).toBeVisible()
-    await tree.getByText('handover.txt', { exact: true }).click({ button: 'right' })
-    const downloaded = page.waitForEvent('download')
-    await machine.getByRole('menuitem', { name: '下载文件', exact: true }).click()
-    const download = await downloaded
-    expect(readFileSync((await download.path())!, 'utf8')).toContain('传输验证通过')
-    await tree.getByText('handover.txt', { exact: true }).click({ button: 'right' })
-    await shot('file-actions')
+    await machine.getByRole('button', { name: '连接诊断', exact: true }).click()
+    const diagnostic = page.getByRole('dialog', { name: '连接诊断' })
+    await diagnostic.getByLabel('诊断账号').selectOption('server:default')
+    await diagnostic.getByRole('button', { name: '开始诊断' }).click()
+    await expect(diagnostic.locator('li').filter({ hasText: '身份认证' })).toContainText('通过')
+    await shot('diagnostics')
     await page.keyboard.press('Escape')
-    await machine.getByRole('button', { name: '新建终端', exact: true }).click()
-    await expect(machine.getByRole('tab', { name: '终端 2', exact: true })).toBeVisible()
-    await expect(machine.locator('.terminal-tab.active i.online')).toBeVisible()
-    await runCommand('whoami', 'demo')
-    await runCommand('hostname', 'gateway-demo')
-    await runCommand('ps -o user,pid,comm -u demo', 'bash')
-    const configFile = await (await request.post(`/api/targets/${demo.primary.id}/files`, { data: { op: 'read', path: '/srv/app/app.yaml' } })).json()
-    await runCommand('sha256sum app.yaml', createHash('sha256').update(configFile.content).digest('hex'))
-    await runCommand('sh deploy.sh', '检查配置完成')
-    const transferNotice = machine.locator('.file-message[role=status] button')
-    if (await transferNotice.count()) await transferNotice.click()
-    await machine.getByRole('button', { name: '切换主题', exact: true }).click()
-    await expect(machine).toHaveAttribute('data-theme', 'dark')
-    await showSystemTree()
-    await expect(machine.getByRole('region', { name: '实时资源使用率' }).locator('dd').first()).not.toHaveText('—', { timeout: 15000 })
-    await shot('workspace-dark')
-    await machine.getByRole('button', { name: '查看 SSH 连接信息' }).click()
-    await shot('connection-info'); await page.keyboard.press('Escape')
-  })
-  await test.step('普通用户授权视图', async () => {
-    const context = await browser.newContext({ locale: 'zh-CN', viewport: { width: 1920, height: 1080 } })
-    const reader = await context.newPage()
-    await reader.goto('http://127.0.0.1:19876')
-    await reader.getByLabel('用户名', { exact: true }).fill('demo-reader')
-    await reader.getByLabel('登录密码').fill('demo-reader-password')
-    await reader.getByRole('button', { name: '进入中转台' }).click()
-    await expect(reader.getByRole('row').filter({ hasText: demo.primary.name })).toBeVisible()
-    await expect(reader.getByRole('button', { name: '帐号管理' })).toHaveCount(0)
-    await reader.screenshot({ path: `${output}/user-workspace.png`, animations: 'disabled' })
-    shots.push('user-workspace'); await context.close()
   })
   expect(errors).toEqual([])
-  writeFileSync(`${output}/manifest.json`, JSON.stringify({ counts: demo.counts, screenshots: shots, source: '真实应用界面；终端通过 SSH 连接独立 OpenSSH 容器，命令实际执行；业务数据为虚构示例。' }, null, 2) + '\n')
+  writeFileSync(`${output}/manifest.json`, JSON.stringify({ counts: demo.counts, screenshots: shots, theme: 'light', source: 'Actual application interface with fictional demo data. Terminal commands run against an isolated OpenSSH container.' }, null, 2) + '\n')
+  rmSync('../site/screenshots', { recursive: true, force: true })
   cpSync(output, '../site/screenshots', { recursive: true })
 })

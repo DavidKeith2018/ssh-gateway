@@ -15,6 +15,8 @@ test('终端打开独立窗口，列表和筛选保留，拦截时提示', async
     await expect(popup).toHaveURL(new RegExp(`machine=${fixture.target.id}.*window=1`))
     const machine = popup.getByRole('main', { name: '终端机器页面' })
     await expect(machine).toBeVisible()
+    await expect(popup).toHaveTitle(fixture.target.name + ' — WebSSH')
+    await expect(page).toHaveTitle('SSH Gateway')
     await expect(machine.locator('.terminal-tab.active i.online')).toBeVisible()
     expect(await popup.evaluate(() => window.opener === null)).toBe(true)
     await expect(page.getByRole('heading', { name: 'SSH 连接', exact: true })).toBeVisible()

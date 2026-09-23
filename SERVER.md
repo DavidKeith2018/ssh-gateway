@@ -2,6 +2,8 @@
 
 SSH Gateway runs as a standalone service with browser administration, WebSSH, SFTP, relay credentials, source restrictions, and connection logs. It needs no desktop environment, Go, Node.js, or external database at runtime.
 
+File and folder favorites are stored in the gateway database, separately for each web user and SSH connection, and included in encrypted backups. Signing in to the same gateway from another browser restores them. Existing browser-local favorites are merged when that connection is opened; the local copy is removed only after a successful import.
+
 ## Separate deployment for AI access
 
 Run the gateway on a separate machine whose files and administration are unavailable to the AI client. Give the client only the target's relay credentials and allow its source IP.
@@ -14,7 +16,7 @@ AI client -> relay credentials + source restrictions -> SSH Gateway -> target se
 
 Keep gateway host access, administrator accounts, database, encryption keys, and backups private. Do not expose them through shared folders, mounts, or synchronization. Use target accounts with only the required privileges, and revoke or rotate relay credentials after use. Source rules and credential expiration are separate controls; another active source rule can still authorize a connection.
 
-Without a master password, access to both the database and master key can reveal stored credentials. A master password protects locked credentials, but cannot prevent a privileged process from reading an unlocked application's memory. The gateway does not provide per-command approval.
+Administrator-password encryption protects locked credentials, but cannot prevent a privileged process from reading an unlocked application's memory. The gateway does not provide per-command approval.
 
 ## Run directly
 
@@ -74,9 +76,9 @@ The service uses the TCP peer address and does not trust `X-Forwarded-For`. Reve
 
 ## Master password
 
-Enable the optional master password in security settings. After each restart, unlock through HTTPS or a loopback management address, then sign in. SSH relay authentication and automatic forwarding wait for unlocking; systemd startup does not unlock the vault. Signing out does not relock a running service.
+Credentials are encrypted using your administrator password by default. After each restart, manually unlock through HTTPS or a loopback management address, then sign in. SSH relay authentication and automatic forwarding wait for unlocking; systemd startup does not unlock the vault. Signing out does not relock a running service.
 
-The master password protects target credentials rather than all stored data. An administrator password reset cannot bypass it. Keep the corresponding master password with a complete backup and protect older backups containing unprotected keys.
+Security encryption protects target credentials rather than all stored data. It uses the administrator password; changing that password while unlocked also updates encryption. Password reset cannot bypass locked encryption. Backups require the administrator password used when they were created. Protect older backups containing unprotected keys.
 
 ## Upgrade, backup, and removal
 

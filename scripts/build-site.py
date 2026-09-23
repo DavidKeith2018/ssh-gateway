@@ -14,7 +14,8 @@ if repository and not re.fullmatch(r'[\w.-]+/[\w.-]+', repository):
 output.mkdir(parents=True, exist_ok=True)
 for name in ['index.html', 'style.css', 'main.js', 'translations.js', 'icon.svg']:
     shutil.copyfile(root / 'site' / name, output / name)
-shutil.copytree(root / 'site' / 'screenshots', output / 'screenshots', dirs_exist_ok=True)
+shutil.rmtree(output / 'screenshots', ignore_errors=True)
+shutil.copytree(root / 'site' / 'screenshots', output / 'screenshots')
 url = f'https://github.com/{repository}' if repository else ''
 (output / 'config.js').write_text('window.SSH_GATEWAY_REPOSITORY = ' + json.dumps(url) + ';\n')
 (output / '.nojekyll').touch()

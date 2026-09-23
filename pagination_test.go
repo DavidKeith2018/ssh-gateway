@@ -33,7 +33,7 @@ func seedPagination(t *testing.T, f *webFixture, n int) {
 		t.Fatal(err)
 	}
 	defer tx.Rollback()
-	if _, err = tx.Exec("DELETE FROM events"); err != nil {
+	if _, err = tx.Exec("DELETE FROM events; DELETE FROM shortcuts"); err != nil {
 		t.Fatal(err)
 	}
 	for i := 0; i < n; i++ {
@@ -272,8 +272,8 @@ func TestShortcutDatabasePersistence(t *testing.T) {
 		t.Fatal(err)
 	}
 	var count int
-	if err = s.db.QueryRow("SELECT COUNT(*) FROM shortcuts").Scan(&count); err != nil || count != 0 {
-		t.Fatalf("不应自动创建命令 %d %v", count, err)
+	if err = s.db.QueryRow("SELECT COUNT(*) FROM shortcuts").Scan(&count); err != nil || count != 5 {
+		t.Fatalf("默认命令数量错误 %d %v", count, err)
 	}
 	if _, err = s.db.Exec("INSERT INTO shortcuts(id,name,command,target_id) VALUES('saved','持久命令','pwd','*')"); err != nil {
 		t.Fatal(err)

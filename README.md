@@ -5,7 +5,7 @@ A lightweight SSH bastion for managing servers, terminals, and remote files. Giv
 - WebSSH terminals, remote file editing, uploads, and downloads.
 - Server accounts, tags, user permissions, and source IP restrictions.
 - Local and reverse port forwarding, diagnostics, and bulk import.
-- Encrypted backups, an optional master password, and light/dark themes.
+- Encrypted backups, credential encryption using the administrator password, and light/dark themes.
 
 ## Download and run
 

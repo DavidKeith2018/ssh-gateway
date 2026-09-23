@@ -143,7 +143,7 @@ func decodeBackup(data []byte, password string) (backupPayload, error) {
 		}
 	}
 	key := p.Files["master.key"]
-	if len(key) != 32 && (len(key) != wrappedMasterKeySize || !bytes.Equal(key[:8], masterPasswordMagic)) {
+	if len(key) != 32 && !validWrappedMasterKey(key) {
 		return p, fmt.Errorf("备份主密钥无效")
 	}
 	if _, err = ssh.ParsePrivateKey(p.Files["host.key"]); err != nil {

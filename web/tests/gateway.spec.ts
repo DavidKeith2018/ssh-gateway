@@ -138,3 +138,11 @@ test('SSH 连接内的全局 IP 白名单添加、续期与删除', async ({ pag
   await expect(dialog).not.toBeVisible()
   await expect(page.getByRole('textbox', { name: '搜索连接' })).toBeVisible()
 })
+
+// Keep navigation visible for these workflows; default collapse is covered by compact-ui.spec.ts.
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => {
+    if (localStorage.getItem('ssh-gateway:sidebar-collapsed') === null)
+      localStorage.setItem('ssh-gateway:sidebar-collapsed', 'false')
+  })
+})

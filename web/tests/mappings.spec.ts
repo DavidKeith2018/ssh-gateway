@@ -43,6 +43,12 @@ test('映射总览、四种真实转发、冲突、修改、单机同步及删�
     } else await expect(row.getByRole('link', { name: '打开' })).toHaveAttribute('href', new RegExp(`^http://.+:${port}/$`))
   }
   await expect(rows).toHaveCount(4)
+  for (const width of [1440, 1024, 800]) {
+    await page.setViewportSize({ width, height: 800 })
+    expect(await overview.locator('.mapping-table-scroll').evaluate(el => el.scrollWidth <= el.clientWidth + 1)).toBe(true)
+    await page.screenshot({ path: `test-results/mapping-compact-${width}.png` })
+  }
+  await page.setViewportSize({ width: 1440, height: 1000 })
   await expect(overview.getByText('更多地址', { exact: true })).toHaveCount(0)
   await overview.getByLabel('筛选转发方向').selectOption('reverse'); await overview.getByLabel('筛选访问范围').selectOption('shared'); await expect(rows).toHaveCount(1)
   await overview.getByRole('button', { name: '清除筛选' }).click(); await page.reload(); await page.locator('.nav-item').filter({ hasText: '端口映射' }).click(); await expect(rows).toHaveCount(4)
@@ -171,4 +177,12 @@ test('映射使用居中弹窗，关闭和 Escape 直接放弃编辑', async ({ 
     await dialog.getByRole('button', { name: '关闭端口映射' }).click()
     expect(prompts).toEqual([])
   } finally { await page.request.delete(`/api/mappings/${mapping.id}`, { data: {} }) }
+})
+
+// Keep navigation visible for these workflows; default collapse is covered by compact-ui.spec.ts.
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => {
+    if (localStorage.getItem('ssh-gateway:sidebar-collapsed') === null)
+      localStorage.setItem('ssh-gateway:sidebar-collapsed', 'false')
+  })
 })

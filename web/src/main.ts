@@ -4,6 +4,7 @@ import LanguageSwitcher from './LanguageSwitcher.vue'
 import { initialiseDesktop } from './desktop'
 import './style.css'
 import './theme.css'
+import './compact.css'
 
 async function start() {
   await initialiseDesktop()

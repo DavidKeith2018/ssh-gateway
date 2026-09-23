@@ -11,11 +11,13 @@ The desktop application uses Wails v3 (`v3.0.0-beta.20`) and shares the Go backe
 
 Windows requires Microsoft WebView2. If the runtime is present, use the app directly. App setup does not install or download it automatically. If missing, run the included `MicrosoftEdgeWebview2Setup.exe` separately; it requires internet access. Both the ZIP and the application installation directory include this helper.
 
-On first launch, set an administrator password and optionally enable a master password. You can select an existing data directory instead. Add a server, verify its host fingerprint, and configure relay credentials and allowed sources. Local desktop terminal connections require the target to allow `127.0.0.1`.
+On first launch, set an administrator password, which also protects stored credentials. You can select an existing data directory instead. Add a server, verify its host fingerprint, and configure relay credentials and allowed sources. Local desktop terminal connections require the target to allow `127.0.0.1`.
 
 Desktop settings control the SSH listener and remote access. The advertised connection address is used in copied connection commands; it does not change the listening interface.
 
 ## Windows, tray, and data
+
+WebSSH opens in a separate application window and keeps the current login, selected account, and language.
 
 Closing the main window normally hides it to the tray while SSH relay connections and file tasks continue. Use **Quit application** to stop the app; unsaved work and active connections require confirmation. On Linux, a StatusNotifier/AppIndicator host is required for the tray. Without it, closing the window enters the quit flow rather than hiding an inaccessible window.
 
@@ -31,7 +33,7 @@ The portable ZIP uses the same default data directory as the installer. Data is 
 
 ## Master password and separation
 
-The optional master password protects target passwords and private keys, not the entire database. After a restart, unlock with the master password before signing in. Resetting the administrator password cannot recover an unknown master password. Protect backups created before enabling this protection as well.
+Credential encryption is enabled by default and uses the administrator password to protect target passwords and private keys, not the entire database. After a restart, unlock with the administrator password before signing in. Changing the administrator password while unlocked also updates encryption. A forgotten password cannot be reset to recover locked credentials. Older backups still require the password in use when they were created.
 
 For AI use, deploy the gateway on a separate system whose data and administrator access are unavailable to the AI. Relay credentials should grant only the required target access. See the [server deployment guide](../SERVER.md#separate-deployment-for-ai-access).
 
@@ -78,3 +80,7 @@ The [desktop workflow](../.github/workflows/desktop.yml) produces test artifacts
 ## Updates
 
 The sidebar shows the running version and supports manual update checks. Release builds also check GitHub Releases at startup and every six hours. Updates provide a release-page link for a manual download; they are not installed automatically. Quit the application before replacing its files and back up the data directory first.
+
+The first setup asks you to confirm that you have saved your administrator password safely. Optional “Remember password on this computer” stores login credentials in the operating system credential store, separately for each data directory. It fills only the sign-in form without signing in automatically. Unlocking after each restart requires manually entering the administrator password. Unchecking the option deletes the saved login; administrator password changes update it.
+
+Only one desktop application runs at a time, including when opened with a different data directory. Launching it again restores the existing window. Windows additionally uses a machine-wide instance lock across user sessions.

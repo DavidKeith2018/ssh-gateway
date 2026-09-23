@@ -5,6 +5,9 @@ export interface DesktopInfo { ready: boolean; needs_setup: boolean; data_dir: s
 export interface TerminalEvent extends LocalizedMessage { id: string; type: string; data?: string; message?: string }
 export interface UpdateInfo { configured: boolean; current_version: string; version: string; available: boolean; url: string; notes: string }
 export interface Native {
+  RememberedLogin(): Promise<{username:string;password:string}>
+  SaveRememberedLogin(username:string,password:string): Promise<void>
+  ForgetRememberedLogin(): Promise<void>
   SetLocale(locale: string): Promise<void>
  CheckUpdate(): Promise<UpdateInfo>
   FrontendReady(): Promise<void>

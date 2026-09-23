@@ -56,7 +56,7 @@ test('连接分页、完整选项、独立终端、请求乱序和失败重试',
     }
     await page.reload()
     const pagination = page.getByRole('navigation', { name: '连接分页', exact: true })
-    const rows = page.locator('.connection-list tbody tr')
+    const rows = page.locator('.connection-list:visible tbody tr')
     await expect(rows).toHaveCount(20)
     const stats = await (await page.request.get('/api/targets/summary')).json()
     await expect(pagination).toContainText(`共 ${stats.total} 条`)

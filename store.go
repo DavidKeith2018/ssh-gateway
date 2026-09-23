@@ -202,6 +202,10 @@ CREATE TABLE IF NOT EXISTS events (
 			return nil, err
 		}
 	}
+	if err := s.seedDefaultShortcuts(); err != nil {
+		db.Close()
+		return nil, err
+	}
 	opened = true
 	return s, nil
 }

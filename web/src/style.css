@@ -57,3 +57,59 @@
 .compact-menu{position:fixed;inset:auto;margin:0;width:190px;padding:6px;border:1px solid #d8e5df;border-radius:10px;background:#fff;color:#294e44;box-shadow:0 8px 28px #142d2526}.compact-menu:popover-open{display:flex;flex-direction:column;gap:2px}.compact-menu button{display:flex;justify-content:space-between;align-items:center;width:100%;padding:9px 12px;border:0;background:transparent;border-radius:6px;text-align:left;font-size:13px;color:inherit}.compact-menu button:hover,.compact-menu button:focus-visible{background:#edf5f0}.compact-menu button[aria-pressed=true]{color:#087864}.compact-menu button:focus-visible{outline:2px solid #16887a;outline-offset:-2px}.settings-menu{display:inline-flex}:root[data-theme=dark] .compact-menu{background:#1d2b2e;color:#dce7e5;border-color:#435951}:root[data-theme=dark] .compact-menu button:hover,:root[data-theme=dark] .compact-menu button:focus-visible{background:#2b443b}:root[data-theme=dark] .compact-menu button[aria-pressed=true]{color:#8bd4b8}
 
 .menu-trigger{display:inline-flex;align-items:center;justify-content:center;gap:5px}.menu-trigger>.menu-chevron{display:block;flex:0 0 12px;align-self:center}
+
+/* Keep connection rows usable in smaller desktop windows. */
+@media(min-width:761px) {
+ .sidebar { width: 170px; padding: 20px 14px; }
+ .workspace { margin-left: 170px; width: calc(100% - 170px); }
+ .content { padding: 20px 18px; }
+ .topbar { height: 56px; padding: 0 18px; }
+ .stats { gap: 10px; margin-bottom: 16px; }
+ .stat-card { padding: 12px 15px; }
+ .stat-card strong { font-size: 25px; }
+ .page-heading { margin-bottom: 16px; }
+ .page-heading h1 { font-size: 23px; }
+ .connection-list table { width: 100%; min-width: 0; table-layout: fixed; }
+ .connection-list :is(th, td) { padding: 9px 7px; font-size: 11px; white-space: normal; overflow-wrap: anywhere; }
+ .connection-list th:nth-child(1) { width: 16%; }
+ .connection-list th:nth-child(2) { width: 9%; }
+ .connection-list th:nth-child(3) { width: 7%; }
+ .connection-list th:nth-child(4) { width: 9%; }
+ .connection-list th:nth-child(5) { width: 12%; }
+ .connection-list th:nth-child(6) { width: 21%; }
+ .connection-list th:last-child { width: 26%; }
+ .connection-list .target-title { gap: 6px; min-width: 0; }
+ .connection-list .target-title > div { min-width: 0; }
+ .connection-list .server-icon { display: none; }
+ .connection-list .target-tags { min-width: 0; gap: 3px; }
+ .connection-list .badge { padding: 1px 4px; font-size: 10px; }
+ .connection-list .account-select { width: 100%; }
+ .connection-list .account-select select { padding: 5px 23px 5px 6px; min-height: 29px; font-size: 11px; }
+ .connection-list .account-select::after { right: 9px; }
+ .connection-list .row-actions { gap: 4px; flex-wrap: wrap; }
+ .connection-list .row-actions button { padding: 4px 6px; font-size: 11px; }
+ .connection-list .source-preview { max-width: 100%; }
+ .connection-list .server-account-warning { font-size: 10px; margin-top: 3px; }
+}
+@media(min-width:761px) and (max-width:1100px) {
+ .sidebar { width: 142px; padding: 16px 10px; }
+ .workspace { margin-left: 142px; width: calc(100% - 142px); }
+ .content { padding: 16px 12px; }
+ .brand { gap: 7px; } .brand strong { font-size: 13px; }
+}
+@media(min-width:761px) {
+ .connection-list th { font-size: 10px; overflow-wrap: normal; word-break: normal; }
+ .connection-list .status-pill { display: inline-flex; align-items: center; padding: 2px 3px; font-size: 10px; white-space: nowrap; }
+ .connection-list .status-pill i { display: none; }
+ .connection-list .target-address { font-size: 10px; font-weight: 400; }
+ .connection-list .target-title strong { font-size: 12px; }
+}
+@media(min-width:761px) and (max-width:1100px) {
+ .brand small { display: none; }
+ .sidebar .nav-item { font-size: 11px; padding: 9px 6px; gap: 6px; }
+ .sidebar .nav-count { display: none; }
+ .connection-list :is(th,td) { padding: 8px 5px; }
+ .connection-list .row-actions { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); }
+ .connection-list .row-actions button { padding: 4px 3px; font-size: 10px; white-space: normal; overflow-wrap: normal; line-height: 1.3; }
+ .connection-list .row-actions .primary { grid-column: 1 / -1; }
+}

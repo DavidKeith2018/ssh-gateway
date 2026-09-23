@@ -4,33 +4,18 @@
     "accounts": 8,
     "mappings": 12,
     "globalIPs": 8,
-    "shortcuts": 12,
+    "shortcuts": 17,
     "notes": 36,
     "files": 6
   },
   "screenshots": [
-    "login",
     "connections",
-    "connection-editor",
     "credentials",
-    "source-access",
-    "notes",
-    "diagnostics",
-    "shortcuts",
     "mappings",
-    "mapping-editor",
     "accounts",
-    "account-permissions",
-    "import",
-    "security",
-    "backup",
-    "relay-settings",
-    "version",
     "workspace",
-    "file-actions",
-    "workspace-dark",
-    "connection-info",
-    "user-workspace"
+    "diagnostics"
   ],
-  "source": "真实应用界面；终端通过 SSH 连接独立 OpenSSH 容器，命令实际执行；业务数据为虚构示例。"
+  "theme": "light",
+  "source": "Actual application interface with fictional demo data. Terminal commands run against an isolated OpenSSH container."
 }
