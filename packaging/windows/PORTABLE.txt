@@ -1,0 +1,11 @@
+SSH Gateway - Windows x64 portable
+
+Extract all files and run ssh-gateway-desktop-windows.exe.
+No application installation is required.
+
+Microsoft WebView2 is required for the desktop window. If it is already installed,
+no runtime installation is needed. If missing, run MicrosoftEdgeWebview2Setup.exe
+separately (internet required), then launch SSH Gateway again.
+
+Data is stored in the current user's application data directory by default,
+not in the extracted ZIP directory. Quit the app before replacing its files.

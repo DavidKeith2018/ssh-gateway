@@ -1,0 +1,27 @@
+name: Linux server build and verification
+on:
+  workflow_dispatch:
+  push:
+    paths: ['**.go', 'go.mod', 'go.sum', 'web/**', 'packaging/server/**', 'scripts/server-smoke.py', 'SERVER.md', 'Makefile', '.github/workflows/server.yml']
+jobs:
+  server:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.26.x'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: make server-linux
+      - run: python3 scripts/server-smoke.py dist/ssh-gateway-server_0.1.0_linux_amd64.tar.gz
+      - run: GATEWAY_ARCH=arm64 bash packaging/server/build.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ssh-gateway-linux-server
+          path: |
+            dist/ssh-gateway-server_*.tar.gz
+            dist/ssh-gateway-server_*.sha256

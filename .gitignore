@@ -1,0 +1,31 @@
+/data/
+/bin/
+*.db
+*.db-shm
+*.db-wal
+/web/node_modules/
+/web/test-results/
+/web/playwright-report/
+/web/.test-fixture/
+
+/.build/
+/dist/
+/desktop/build/bin/
+/desktop/wailsjs/
+
+/packaging/windows/MicrosoftEdgeWebview2Setup.exe
+/desktop/*_windows.syso
+
+/desktop/*_windows_amd64.syso
+
+# 本地第三方参考资料，不属于项目源码。
+/analysis/
+/mayfly_go_web.zip
+__pycache__/
+
+/desktop/frontend/dist/
+
+# 从仓库根目录运行浏览器测试时生成的临时数据。
+/.test-fixture/
+/test-results/
+/playwright-report/

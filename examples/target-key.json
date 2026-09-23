@@ -1,0 +1,16 @@
+{
+  "id": "key-server",
+  "name": "密钥认证服务器",
+  "host": "192.168.1.20",
+  "port": 22,
+  "user": "ubuntu",
+  "auth_type": "private_key",
+  "target_private_key": "请替换为完整的 OpenSSH 或 PEM 私钥内容，换行使用 JSON 的 \n 转义",
+  "target_key_passphrase": "请填写私钥密码，未加密私钥留空",
+  "host_fingerprint": "请替换为核对后的 SHA256 主机指纹",
+  "relay_user": "ai-key",
+  "relay_password": "",
+  "source_mode": "private",
+  "allowed_sources": ["192.168.1.0/24", "127.0.0.1", "::1"],
+  "enabled": true
+}

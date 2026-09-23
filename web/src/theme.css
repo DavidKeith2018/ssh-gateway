@@ -1,0 +1,50 @@
+.theme-toggle { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
+.theme-toggle > span { font-size: 17px; line-height: 1; }
+.theme-toggle:focus-visible { outline: 2px solid #16887a; outline-offset: 2px; }
+
+:root[data-theme='dark'] { color-scheme: dark; color: #dce7e5; background: #101719; }
+:root[data-theme='dark'] :is(.app-layout, .login-page) {
+  --border: #344548;
+  color: #dce7e5;
+  background: #101719;
+}
+:root[data-theme='dark'] :is(.sidebar, .topbar, .login-card, .stat-card, .connection-list) {
+  background: #182326;
+  border-color: #344548;
+}
+:root[data-theme='dark'] :is(.app-layout, .login-page) :is(button, input, textarea, select, dialog) {
+  color: #dce7e5;
+  background: #1d2b2e;
+  border-color: #3e5356;
+}
+:root[data-theme='dark'] :is(.app-layout, .login-page) button:hover { background: #2a3e40; }
+:root[data-theme='dark'] :is(.app-layout, .login-page) :is(input, textarea):disabled { color: #9cacad; background: #243134; }
+:root[data-theme='dark'] :is(.app-layout, .login-page) :is(input, textarea)::placeholder { color: #9cacad; }
+:root[data-theme='dark'] :is(.app-layout, .login-page) :is(button.primary, .pagination button[aria-current=page]) {
+  color: #fff; background: #0c796d; border-color: #21998b;
+}
+:root[data-theme='dark'] :is(.app-layout, .login-page) button.primary:hover { background: #108b7d; }
+:root[data-theme='dark'] .app-layout button.danger { color: #fff; background: #a63636; border-color: #ca6666; }
+:root[data-theme='dark'] .app-layout :is(.nav-item, .text-button, .inline-link, .editor-link, .close-button, .relay-settings-link) {
+  background: transparent; border-color: transparent; color: #b2c6c3;
+}
+:root[data-theme='dark'] .app-layout :is(.nav-item.active, .security-modes button[aria-pressed=true], .tag-choice[aria-pressed=true]) {
+  color: #8ee0c9; background: #23413c; border-color: #355b51;
+}
+:root[data-theme='dark'] :is(.app-layout, .login-page) :is(.muted, .hint, .eyebrow, .nav-label, .brand small, .sidebar-bottom, .topbar, .text-button, .separator, .stat-card > span, .stat-card strong small, .source-stat > small, .target-title small, .scope-label, .source-line, .workspace-footer, .list-footer, th, .target-editor-header p, .editor-section-heading small, .fold-toggle small, .fold-toggle > span:last-child, .tag-options small, .editor-footer-row > span, .login-summary small) { color: #a8bbba; }
+:root[data-theme='dark'] .app-layout :is(th, td, .dialog-heading, .dialog-footer, .target-editor-header, .target-editor-footer, .fold-body, .login-body, .relay-card-editor, .login-card-editor, .editor-fold, .tag-input-box) { border-color: #344548; }
+:root[data-theme='dark'] .app-layout :is(th, .list-footer, .dialog-footer, .target-editor-footer, .fold-toggle, .fingerprint-summary, .login-summary) { background: #1c2a2d; }
+:root[data-theme='dark'] .app-layout :is(.badge, .nav-count, .avatar, .server-icon, .tag-chip, .tag-choice, .empty-icon, .login-avatar, .login-toggle small) { color: #a5d7c8; background: #263d37; border-color: #3c5a51; }
+:root[data-theme='dark'] .app-layout :is(.status-pill, .notice, .security-success, .row-actions .terminal-button) { color: #99e0bc; background: #203c30; border-color: #355b46; }
+:root[data-theme='dark'] .app-layout .status-pill.disabled { color: #b1bcbc; background: #303c3e; }
+:root[data-theme='dark'] :is(.app-layout, .login-page) :is(.error, .notice-error) { color: #ffb5aa; background: #442c2b; border-color: #71433e; }
+:root[data-theme='dark'] .app-layout .notice button { color: inherit; background: transparent; border: 0; }
+:root[data-theme='dark'] .app-layout :is(code, .empty-state h2) { color: #c5ddd3; }
+:root[data-theme='dark'] .app-layout .empty-state { color: #a8bbba; }
+:root[data-theme='dark'] .app-layout .fold-toggle .needs-input { color: #edc884; }
+:root[data-theme='dark'] .app-layout .pagination select option { color: #dce7e5; background: #1d2b2e; }
+:root[data-theme='dark'] .login-page :is(.intro-lead, .isolation-note, .isolation-note strong, .isolation-route small) { color: #b4c9c4; }
+:root[data-theme='dark'] .login-page :is(.intro-benefits, .login-intro em) { color: #85d5bf; }
+:root[data-theme='dark'] .login-page .isolation-route > span { color: #c6ded5; background: #1d2b2e; border-color: #3e5356; }
+:root[data-theme='dark'] .login-page .isolation-route .relay-node { color: #8ee0c9; background: #23413c; border-color: #355b51; }
+:root[data-theme='dark'] :is(.app-layout, .login-page) :is(.danger-text, button.danger-text) { color: #ffaaaa; }

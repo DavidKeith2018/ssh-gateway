@@ -1,0 +1,14 @@
+{
+  "id": "dev-server",
+  "name": "开发服务器",
+  "host": "192.168.1.20",
+  "port": 22,
+  "user": "ubuntu",
+  "target_password": "请替换为目标服务器密码",
+  "host_fingerprint": "请替换为核对后的 SHA256 主机指纹",
+  "relay_user": "ai-dev",
+  "relay_password": "",
+  "source_mode": "private",
+  "allowed_sources": ["192.168.1.0/24", "127.0.0.1", "::1"],
+  "enabled": true
+}

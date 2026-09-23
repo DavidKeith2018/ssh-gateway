@@ -1,0 +1,19 @@
+{
+  "name": "多账号服务器",
+  "host": "192.168.1.20",
+  "port": 22,
+  "tags": ["开发"],
+  "enabled": true,
+  "host_fingerprint": "请替换为核对后的 SHA256 主机指纹",
+  "default_login_id": "ubuntu-login",
+  "logins": [
+    {"id": "ubuntu-login", "user": "ubuntu", "auth_type": "password", "target_password": "请替换为 ubuntu 的密码"},
+    {"id": "root-login", "user": "root", "auth_type": "private_key", "target_private_key": "请替换为完整私钥", "target_key_passphrase": "未加密私钥请留空"}
+  ],
+  "relays": [
+    {"id": "ubuntu-relay", "username": "", "password": "", "login_id": "ubuntu-login", "enabled": true},
+    {"id": "root-relay", "username": "", "password": "", "login_id": "root-login", "enabled": false}
+  ],
+  "source_mode": "private",
+  "allowed_sources": ["127.0.0.1", "192.168.1.0/24"]
+}

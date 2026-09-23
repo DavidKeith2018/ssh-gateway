@@ -1,0 +1,20 @@
+[Unit]
+Description=SSH Gateway server and web management
+After=network.target
+
+[Service]
+Type=simple
+DynamicUser=yes
+StateDirectory=ssh-gateway-server
+StateDirectoryMode=0700
+WorkingDirectory=/var/lib/ssh-gateway-server
+EnvironmentFile=/etc/ssh-gateway-server.conf
+ExecStart=/usr/local/bin/ssh-gateway-server -data /var/lib/ssh-gateway-server -listen ${GATEWAY_SSH_LISTEN} -web ${GATEWAY_WEB_LISTEN} -tls-cert ${GATEWAY_TLS_CERT} -tls-key ${GATEWAY_TLS_KEY} serve
+Restart=on-failure
+RestartSec=3
+TimeoutStopSec=30
+UMask=0077
+NoNewPrivileges=yes
+
+[Install]
+WantedBy=multi-user.target

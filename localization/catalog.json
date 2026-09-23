@@ -1,0 +1,1748 @@
+{
+  "backend.724e0b47a725": {
+    "source": "中转凭证数据损坏，无法迁移",
+    "zh-CN": "中转凭证数据损坏，无法迁移",
+    "en": "Relay credential data is corrupt and cannot be migrated",
+    "prefix": false
+  },
+  "backend.8b50f30a8b18": {
+    "source": "中转凭证数据损坏",
+    "zh-CN": "中转凭证数据损坏",
+    "en": "Relay credential data is corrupt",
+    "prefix": false
+  },
+  "backend.98fd36ccfed5": {
+    "source": "无法解密中转凭证",
+    "zh-CN": "无法解密中转凭证",
+    "en": "Unable to decrypt relay credentials",
+    "prefix": false
+  },
+  "backend.98c1a222cb8b": {
+    "source": "目标不存在",
+    "zh-CN": "目标不存在",
+    "en": "Target does not exist",
+    "prefix": false
+  },
+  "backend.6086463cc554": {
+    "source": "中转凭证不存在",
+    "zh-CN": "中转凭证不存在",
+    "en": "Relay credentials do not exist",
+    "prefix": false
+  },
+  "backend.595b8d9c498a": {
+    "source": "目标或中转凭证已禁用，请启用后复制",
+    "zh-CN": "目标或中转凭证已禁用，请启用后复制",
+    "en": "Target or relay credentials are disabled. Enable them before copying.",
+    "prefix": false
+  },
+  "backend.a63813d715aa": {
+    "source": "中转凭证未绑定有效目标账号",
+    "zh-CN": "中转凭证未绑定有效目标账号",
+    "en": "Relay credentials are not linked to a valid target account",
+    "prefix": false
+  },
+  "backend.34457c11a4fe": {
+    "source": "读取中转密码失败，请重试",
+    "zh-CN": "读取中转密码失败，请重试",
+    "en": "Failed to read relay password. Please try again.",
+    "prefix": false
+  },
+  "backend.757c3700e60c": {
+    "source": "读取允许来源失败，请重试",
+    "zh-CN": "读取允许来源失败，请重试",
+    "en": "Failed to read allowed sources. Please try again.",
+    "prefix": false
+  },
+  "backend.0f6f581bf898": {
+    "source": "配置已被修改，请重新读取中转凭证",
+    "zh-CN": "配置已被修改，请重新读取中转凭证",
+    "en": "Configuration changed. Reload the relay credentials.",
+    "prefix": false
+  },
+  "backend.45cf8d7dbfa8": {
+    "source": "读取中转访问设置失败",
+    "zh-CN": "读取中转访问设置失败",
+    "en": "Failed to read relay access settings",
+    "prefix": false
+  },
+  "backend.5e1cfc45fa6d": {
+    "source": "没有此机器的访问权限",
+    "zh-CN": "没有此机器的访问权限",
+    "en": "You do not have access to this machine",
+    "prefix": false
+  },
+  "backend.44ed19f942c6": {
+    "source": "至少配置一个允许的来源 IP 或网段",
+    "zh-CN": "至少配置一个允许的来源 IP 或网段",
+    "en": "Configure at least one allowed source IP or network",
+    "prefix": false
+  },
+  "backend.93c4165bac69": {
+    "source": "无效的来源 IP 或网段：%q",
+    "zh-CN": "无效的来源 IP 或网段：{0}",
+    "en": "Invalid source IP or network: {0}",
+    "prefix": false
+  },
+  "backend.0fb61b09c167": {
+    "source": "目标 SSH 主机指纹不匹配",
+    "zh-CN": "目标 SSH 主机指纹不匹配",
+    "en": "Target SSH host fingerprint does not match",
+    "prefix": false
+  },
+  "backend.176790d720d8": {
+    "source": "已读取主机指纹",
+    "zh-CN": "已读取主机指纹",
+    "en": "Host fingerprint read",
+    "prefix": false
+  },
+  "backend.0e00c2352377": {
+    "source": "无法读取已保存的目标凭证",
+    "zh-CN": "无法读取已保存的目标凭证",
+    "en": "Unable to read saved target credentials",
+    "prefix": false
+  },
+  "backend.573ea98a0b46": {
+    "source": "目标凭证数据损坏",
+    "zh-CN": "目标凭证数据损坏",
+    "en": "Target credential data is corrupt",
+    "prefix": false
+  },
+  "backend.b3e008a42d62": {
+    "source": "请配置 1～16 个目标账号",
+    "zh-CN": "请配置 1～16 个目标账号",
+    "en": "Configure 1–16 target accounts",
+    "prefix": false
+  },
+  "backend.6506591a6b47": {
+    "source": "请配置 1～32 组中转凭证",
+    "zh-CN": "请配置 1～32 组中转凭证",
+    "en": "Configure 1–32 sets of relay credentials",
+    "prefix": false
+  },
+  "backend.8aa07825e176": {
+    "source": "目标账号名称或编号无效",
+    "zh-CN": "目标账号名称或编号无效",
+    "en": "Invalid target account name or ID",
+    "prefix": false
+  },
+  "backend.f397da25249f": {
+    "source": "目标账号名称和编号不能重复",
+    "zh-CN": "目标账号名称和编号不能重复",
+    "en": "Target account names and IDs must be unique",
+    "prefix": false
+  },
+  "backend.6dc847177602": {
+    "source": "密码认证不能同时填写私钥",
+    "zh-CN": "密码认证不能同时填写私钥",
+    "en": "Password authentication cannot include a private key",
+    "prefix": false
+  },
+  "backend.c8bf862f660e": {
+    "source": "请填写目标账号 %s 的密码",
+    "zh-CN": "请填写目标账号 {0} 的密码",
+    "en": "Enter the password for target account {0}",
+    "prefix": false
+  },
+  "backend.61e36db0e56a": {
+    "source": "私钥认证不能同时填写目标密码",
+    "zh-CN": "私钥认证不能同时填写目标密码",
+    "en": "Password and private key authentication cannot be combined",
+    "prefix": false
+  },
+  "backend.9ad3fab6e464": {
+    "source": "请提供目标账号 %s 的私钥；修改私钥密码也需重新提供私钥",
+    "zh-CN": "请提供目标账号 {0} 的私钥；修改私钥密码也需重新提供私钥",
+    "en": "Provide the private key for target account {0}. Changing its passphrase also requires the private key.",
+    "prefix": false
+  },
+  "backend.06d99221cfe4": {
+    "source": "目标认证方式无效",
+    "zh-CN": "目标认证方式无效",
+    "en": "Invalid target authentication method",
+    "prefix": false
+  },
+  "backend.654f89e8f182": {
+    "source": "请选择有效的默认目标账号",
+    "zh-CN": "请选择有效的默认目标账号",
+    "en": "Select a valid default target account",
+    "prefix": false
+  },
+  "backend.b9f9152bfa8f": {
+    "source": "中转账号名称或编号无效",
+    "zh-CN": "中转账号名称或编号无效",
+    "en": "Invalid relay account name or ID",
+    "prefix": false
+  },
+  "backend.1cda947bde83": {
+    "source": "中转账号名称和编号不能重复",
+    "zh-CN": "中转账号名称和编号不能重复",
+    "en": "Relay account names and IDs must be unique",
+    "prefix": false
+  },
+  "backend.87b4150f9356": {
+    "source": "中转账号必须绑定一个有效的目标账号",
+    "zh-CN": "中转账号必须绑定一个有效的目标账号",
+    "en": "Relay accounts must be linked to a valid target account",
+    "prefix": false
+  },
+  "backend.8c68f3efeee6": {
+    "source": "中转密码长度必须在 12～72 字节之间",
+    "zh-CN": "中转密码长度必须在 12～72 字节之间",
+    "en": "Relay password must be 12–72 bytes",
+    "prefix": false
+  },
+  "backend.d57e7a4d062a": {
+    "source": "请先登录中转台",
+    "zh-CN": "请先登录中转台",
+    "en": "Sign in to the gateway first",
+    "prefix": false
+  },
+  "backend.d380425b3669": {
+    "source": "机器 ID 无效",
+    "zh-CN": "机器 ID 无效",
+    "en": "Invalid machine ID",
+    "prefix": false
+  },
+  "backend.2b7ab398c40d": {
+    "source": "机器不存在",
+    "zh-CN": "机器不存在",
+    "en": "Machine does not exist",
+    "prefix": false
+  },
+  "backend.db04a1bd75a1": {
+    "source": "打开窗口过于频繁，请稍后再试",
+    "zh-CN": "打开窗口过于频繁，请稍后再试",
+    "en": "Too many windows opened. Please try again later.",
+    "prefix": false
+  },
+  "backend.a610bbbff3c7": {
+    "source": "主密码长度必须为 12～1024 字节",
+    "zh-CN": "主密码长度必须为 12～1024 字节",
+    "en": "Master password must be 12–1024 bytes",
+    "prefix": false
+  },
+  "backend.60e073db9457": {
+    "source": "数据加密密钥长度无效",
+    "zh-CN": "数据加密密钥长度无效",
+    "en": "Invalid data encryption key length",
+    "prefix": false
+  },
+  "backend.0b859c2b0eba": {
+    "source": "主密码密钥文件损坏或版本不受支持，请恢复备份",
+    "zh-CN": "主密码密钥文件损坏或版本不受支持，请恢复备份",
+    "en": "Master password key file is corrupt or its version is unsupported. Restore a backup.",
+    "prefix": false
+  },
+  "backend.0f2a378d2a80": {
+    "source": "主密码过长",
+    "zh-CN": "主密码过长",
+    "en": "Master password is too long",
+    "prefix": false
+  },
+  "backend.b2625455830a": {
+    "source": "主密码不正确或密钥文件已损坏",
+    "zh-CN": "主密码不正确或密钥文件已损坏",
+    "en": "Incorrect master password or corrupt key file",
+    "prefix": false
+  },
+  "backend.c49431bf9a71": {
+    "source": "凭证已锁定，请先输入主密码解锁",
+    "zh-CN": "凭证已锁定，请先输入主密码解锁",
+    "en": "Credentials are locked. Enter the master password to unlock them.",
+    "prefix": false
+  },
+  "backend.5e78052526e1": {
+    "source": "主密钥文件已被其他进程修改，请重启后解锁",
+    "zh-CN": "主密钥文件已被其他进程修改，请重启后解锁",
+    "en": "The master key file was changed by another process. Restart and unlock again.",
+    "prefix": false
+  },
+  "backend.ed1ee59db38c": {
+    "source": "数据密钥不一致，请重启应用",
+    "zh-CN": "数据密钥不一致，请重启应用",
+    "en": "Data keys do not match. Restart the app.",
+    "prefix": false
+  },
+  "backend.18e8e1887a48": {
+    "source": "尚未启用主密码",
+    "zh-CN": "尚未启用主密码",
+    "en": "Master password is not enabled",
+    "prefix": false
+  },
+  "backend.47c6da1b6f66": {
+    "source": "另一个进程正在修改主密码，请稍后重试",
+    "zh-CN": "另一个进程正在修改主密码，请稍后重试",
+    "en": "Another process is changing the master password. Please try again later.",
+    "prefix": false
+  },
+  "backend.f056fc566bda": {
+    "source": "主密钥文件已改变，请重启后重试",
+    "zh-CN": "主密钥文件已改变，请重启后重试",
+    "en": "The master key file changed. Restart and try again.",
+    "prefix": false
+  },
+  "backend.239499c5409c": {
+    "source": "ID 和中转用户名必须是 1～64 位字母、数字、下划线、点或连字符，且以字母或数字开头",
+    "zh-CN": "ID 和中转用户名必须是 1～64 位字母、数字、下划线、点或连字符，且以字母或数字开头",
+    "en": "ID and relay username must be 1–64 letters, digits, underscores, dots, or hyphens, starting with a letter or digit",
+    "prefix": false
+  },
+  "backend.81c671d34aaf": {
+    "source": "名称、主机和目标用户名不能为空；主机应为 IP 或域名，不含端口",
+    "zh-CN": "名称、主机和目标用户名不能为空；主机应为 IP 或域名，不含端口",
+    "en": "Name, host, and target username are required. Host must be an IP or domain without a port.",
+    "prefix": false
+  },
+  "backend.768d05d7532b": {
+    "source": "端口必须在 1～65535 之间",
+    "zh-CN": "端口必须在 1～65535 之间",
+    "en": "Port must be between 1 and 65535",
+    "prefix": false
+  },
+  "backend.9f9bb60cac57": {
+    "source": "必须填写目标主机的 SHA256 SSH 指纹",
+    "zh-CN": "必须填写目标主机的 SHA256 SSH 指纹",
+    "en": "Provide the target host's SHA256 SSH fingerprint",
+    "prefix": false
+  },
+  "backend.61b57d65a44c": {
+    "source": "来源模式必须为 private 或 custom",
+    "zh-CN": "来源模式必须为 private 或 custom",
+    "en": "Source mode must be private or custom",
+    "prefix": false
+  },
+  "backend.70a57dba75b8": {
+    "source": "仅内网模式只能填写私有或回环网段",
+    "zh-CN": "仅内网模式只能填写私有或回环网段",
+    "en": "Private network mode only allows private or loopback networks",
+    "prefix": false
+  },
+  "backend.5cc03582cf54": {
+    "source": "配置已被修改，请刷新后重试",
+    "zh-CN": "配置已被修改，请刷新后重试",
+    "en": "Configuration changed. Refresh and try again.",
+    "prefix": false
+  },
+  "backend.40a31f8b2aed": {
+    "source": "中转用户名已被其他机器使用",
+    "zh-CN": "中转用户名已被其他机器使用",
+    "en": "Relay username is already used by another machine",
+    "prefix": false
+  },
+  "backend.f0f8df830e5b": {
+    "source": "配置已被其他进程修改，请刷新后重试",
+    "zh-CN": "配置已被其他进程修改，请刷新后重试",
+    "en": "Configuration was changed by another process. Refresh and try again.",
+    "prefix": false
+  },
+  "backend.af818549dcf7": {
+    "source": "认证失败或来源 IP 不允许",
+    "zh-CN": "认证失败或来源 IP 不允许",
+    "en": "Authentication failed or source IP is not allowed",
+    "prefix": false
+  },
+  "backend.a6d8e3afc116": {
+    "source": "目标认证数据损坏",
+    "zh-CN": "目标认证数据损坏",
+    "en": "Target authentication data is corrupt",
+    "prefix": false
+  },
+  "backend.bc80571af68c": {
+    "source": "连接地址应为主机名或 IP",
+    "zh-CN": "连接地址应为主机名或 IP",
+    "en": "Connection address must be a hostname or IP",
+    "prefix": false
+  },
+  "backend.5cb14483eeed": {
+    "source": "SSH 启动失败，请修改端口或关闭占用程序：",
+    "zh-CN": "SSH 启动失败，请修改端口或关闭占用程序：{0}",
+    "en": "Failed to start SSH. Change the port or close the program using it: {0}",
+    "prefix": true
+  },
+  "backend.4bfd69263462": {
+    "source": "应用已退出",
+    "zh-CN": "应用已退出",
+    "en": "App has exited",
+    "prefix": false
+  },
+  "backend.31644e2e4720": {
+    "source": "请求路径无效",
+    "zh-CN": "请求路径无效",
+    "en": "Invalid request path",
+    "prefix": false
+  },
+  "backend.d531102af19f": {
+    "source": "查询参数无效",
+    "zh-CN": "查询参数无效",
+    "en": "Invalid query parameters",
+    "prefix": false
+  },
+  "backend.c53042da1749": {
+    "source": "不支持的请求",
+    "zh-CN": "不支持的请求",
+    "en": "Unsupported request",
+    "prefix": false
+  },
+  "backend.0f3a5de4579d": {
+    "source": "管理员密码要求 12～72 字节",
+    "zh-CN": "管理员密码要求 12～72 字节",
+    "en": "Administrator password must be 12–72 bytes",
+    "prefix": false
+  },
+  "backend.72f9ae9368ba": {
+    "source": "管理员已设置，请登录",
+    "zh-CN": "管理员已设置，请登录",
+    "en": "Administrator already configured. Please sign in.",
+    "prefix": false
+  },
+  "backend.977d0fab9b5e": {
+    "source": "主密码设置失败：%v；初始化回滚失败，请重启后检查设置",
+    "zh-CN": "主密码设置失败：{0}；初始化回滚失败，请重启后检查设置",
+    "en": "Failed to set master password: {0}. Initialization rollback also failed. Restart and check the settings.",
+    "prefix": false
+  },
+  "backend.0afee7db9c71": {
+    "source": "当前密码不正确",
+    "zh-CN": "当前密码不正确",
+    "en": "Current password is incorrect",
+    "prefix": false
+  },
+  "backend.2998ea25c675": {
+    "source": "不支持的管理操作",
+    "zh-CN": "不支持的管理操作",
+    "en": "Unsupported management operation",
+    "prefix": false
+  },
+  "backend.a73be32c8adb": {
+    "source": "存在活动连接，请确认断开后再修改监听",
+    "zh-CN": "存在活动连接，请确认断开后再修改监听",
+    "en": "There are active connections. Confirm disconnection before changing the listener.",
+    "prefix": false
+  },
+  "backend.e215e9d5c739": {
+    "source": "终端已存在或数量达到上限",
+    "zh-CN": "终端已存在或数量达到上限",
+    "en": "Terminal already exists or the limit has been reached",
+    "prefix": false
+  },
+  "backend.8f61209effe0": {
+    "source": "终端已取消",
+    "zh-CN": "终端已取消",
+    "en": "Terminal canceled",
+    "prefix": false
+  },
+  "backend.b3d357bb22cf": {
+    "source": "终端会话已结束",
+    "zh-CN": "终端会话已结束",
+    "en": "Terminal session ended",
+    "prefix": false
+  },
+  "backend.cd9af31694ff": {
+    "source": "终端已断开",
+    "zh-CN": "终端已断开",
+    "en": "Terminal disconnected",
+    "prefix": false
+  },
+  "backend.5be0323e8adc": {
+    "source": "已连接",
+    "zh-CN": "已连接",
+    "en": "Connected",
+    "prefix": false
+  },
+  "backend.f5de0b12e480": {
+    "source": "输入过长",
+    "zh-CN": "输入过长",
+    "en": "Input is too long",
+    "prefix": false
+  },
+  "backend.e62e59ab14c8": {
+    "source": "映射 ID 不匹配",
+    "zh-CN": "映射 ID 不匹配",
+    "en": "Forwarding ID does not match",
+    "prefix": false
+  },
+  "backend.0b850f3ae2ff": {
+    "source": "映射不存在",
+    "zh-CN": "映射不存在",
+    "en": "Forwarding rule does not exist",
+    "prefix": false
+  },
+  "backend.b0e5c7299534": {
+    "source": "私钥不能超过 32 KiB，私钥密码不能超过 4096 字节",
+    "zh-CN": "私钥不能超过 32 KiB，私钥密码不能超过 4096 字节",
+    "en": "Private key must not exceed 32 KiB; passphrase must not exceed 4096 bytes",
+    "prefix": false
+  },
+  "backend.c2d9c1d90e7e": {
+    "source": "该私钥已加密，请填写私钥密码",
+    "zh-CN": "该私钥已加密，请填写私钥密码",
+    "en": "This private key is encrypted. Enter its passphrase.",
+    "prefix": false
+  },
+  "backend.387665cfa5d2": {
+    "source": "无法解密私钥，请检查私钥密码和私钥内容",
+    "zh-CN": "无法解密私钥，请检查私钥密码和私钥内容",
+    "en": "Unable to decrypt private key. Check the passphrase and key contents.",
+    "prefix": false
+  },
+  "backend.e181910ed2a4": {
+    "source": "私钥格式无效或不受支持，请提供 OpenSSH 或 PEM 格式私钥",
+    "zh-CN": "私钥格式无效或不受支持，请提供 OpenSSH 或 PEM 格式私钥",
+    "en": "Invalid or unsupported private key. Provide an OpenSSH or PEM key.",
+    "prefix": false
+  },
+  "backend.a989ddadc83e": {
+    "source": "该私钥未加密，请清空私钥密码",
+    "zh-CN": "该私钥未加密，请清空私钥密码",
+    "en": "This private key is not encrypted. Clear the passphrase.",
+    "prefix": false
+  },
+  "backend.08f6c5a24fde": {
+    "source": "密码认证不能同时提供私钥或私钥密码",
+    "zh-CN": "密码认证不能同时提供私钥或私钥密码",
+    "en": "Password authentication cannot include a private key or passphrase",
+    "prefix": false
+  },
+  "backend.f64e2ba168c5": {
+    "source": "新建目标或切换到密码认证时必须提供目标密码",
+    "zh-CN": "新建目标或切换到密码认证时必须提供目标密码",
+    "en": "Provide a target password when creating a target or switching to password authentication",
+    "prefix": false
+  },
+  "backend.d3f969de34fb": {
+    "source": "私钥认证不能同时提供目标密码",
+    "zh-CN": "私钥认证不能同时提供目标密码",
+    "en": "Private key authentication cannot include a target password",
+    "prefix": false
+  },
+  "backend.a2674728eb3c": {
+    "source": "请提供私钥；更换私钥密码时也需重新提供私钥",
+    "zh-CN": "请提供私钥；更换私钥密码时也需重新提供私钥",
+    "en": "Provide the private key. Changing its passphrase also requires the key.",
+    "prefix": false
+  },
+  "backend.177db7709b16": {
+    "source": "认证方式必须为 password 或 private_key",
+    "zh-CN": "认证方式必须为 password 或 private_key",
+    "en": "Authentication method must be password or private_key",
+    "prefix": false
+  },
+  "backend.567d628079d2": {
+    "source": "目标账号凭证无效",
+    "zh-CN": "目标账号凭证无效",
+    "en": "Invalid target account credentials",
+    "prefix": false
+  },
+  "backend.2f68d28fba65": {
+    "source": "无法解密目标认证信息",
+    "zh-CN": "无法解密目标认证信息",
+    "en": "Unable to decrypt target authentication information",
+    "prefix": false
+  },
+  "backend.0a6409a1d400": {
+    "source": "目标私钥数据损坏",
+    "zh-CN": "目标私钥数据损坏",
+    "en": "Target private key data is corrupt",
+    "prefix": false
+  },
+  "backend.ba712d31ddb3": {
+    "source": "不支持的目标认证方式",
+    "zh-CN": "不支持的目标认证方式",
+    "en": "Unsupported target authentication method",
+    "prefix": false
+  },
+  "backend.e27db0cb9b43": {
+    "source": "转发管理器已停止",
+    "zh-CN": "转发管理器已停止",
+    "en": "Forwarding manager stopped",
+    "prefix": false
+  },
+  "backend.fa224625e74e": {
+    "source": "当前来源不允许访问，或目标已禁用",
+    "zh-CN": "当前来源不允许访问，或目标已禁用",
+    "en": "Current source is not allowed or target is disabled",
+    "prefix": false
+  },
+  "backend.b9de7e6dbebd": {
+    "source": "同时运行的映射最多 32 条",
+    "zh-CN": "同时运行的映射最多 32 条",
+    "en": "At most 32 forwarding rules can run at once",
+    "prefix": false
+  },
+  "backend.e7ed77e6c795": {
+    "source": "建立映射超时，请检查 SSH 连接和转发策略",
+    "zh-CN": "建立映射超时，请检查 SSH 连接和转发策略",
+    "en": "Timed out establishing forwarding. Check the SSH connection and forwarding policy.",
+    "prefix": false
+  },
+  "backend.d3e32f3110cc": {
+    "source": "SSH 连接失败：%w",
+    "zh-CN": "SSH 连接失败：{0}",
+    "en": "SSH connection failed: {0}",
+    "prefix": false
+  },
+  "backend.6f21890e2cd0": {
+    "source": "无法建立映射入口（端口占用、权限或 SSH 转发策略）：%w",
+    "zh-CN": "无法建立映射入口（端口占用、权限或 SSH 转发策略）：{0}",
+    "en": "Unable to create forwarding endpoint (port in use, permissions, or SSH forwarding policy): {0}",
+    "prefix": false
+  },
+  "backend.6ec24ffc837b": {
+    "source": "目标配置或访问授权已变更",
+    "zh-CN": "目标配置或访问授权已变更",
+    "en": "Target configuration or access authorization changed",
+    "prefix": false
+  },
+  "backend.972bbf43642c": {
+    "source": "SSH 连接已断开，请重试",
+    "zh-CN": "SSH 连接已断开，请重试",
+    "en": "SSH connection closed. Please try again.",
+    "prefix": false
+  },
+  "backend.d1a51d09dc38": {
+    "source": "映射入口已关闭：%w",
+    "zh-CN": "映射入口已关闭：{0}",
+    "en": "Forwarding endpoint closed: {0}",
+    "prefix": false
+  },
+  "backend.3ab0be30de32": {
+    "source": "映射、目标配置或访问授权已变更",
+    "zh-CN": "映射、目标配置或访问授权已变更",
+    "en": "Forwarding rule, target configuration, or access authorization changed",
+    "prefix": false
+  },
+  "backend.6a92f82a0340": {
+    "source": "远程 SSH 服务扩大了监听范围；仅自身访问未生效，请将 GatewayPorts 配置为 clientspecified 后重试",
+    "zh-CN": "远程 SSH 服务扩大了监听范围；仅自身访问未生效，请将 GatewayPorts 配置为 clientspecified 后重试",
+    "en": "Remote SSH expanded the listening scope. Local-only access did not take effect. Set GatewayPorts to clientspecified and try again.",
+    "prefix": false
+  },
+  "backend.1c452db23e89": {
+    "source": "远程 SSH 服务未允许全网卡监听，请检查 GatewayPorts clientspecified 和转发策略",
+    "zh-CN": "远程 SSH 服务未允许全网卡监听，请检查 GatewayPorts clientspecified 和转发策略",
+    "en": "Remote SSH did not allow listening on all interfaces. Check GatewayPorts clientspecified and the forwarding policy.",
+    "prefix": false
+  },
+  "backend.edef590e64fd": {
+    "source": "当前终端未连接，请先建立终端连接",
+    "zh-CN": "当前终端未连接，请先建立终端连接",
+    "en": "Terminal is not connected. Establish a terminal connection first.",
+    "prefix": false
+  },
+  "backend.f3be310f3ea4": {
+    "source": "机器操作不支持全局 SSH 请求",
+    "zh-CN": "机器操作不支持全局 SSH 请求",
+    "en": "Machine operations do not support global SSH requests",
+    "prefix": false
+  },
+  "backend.e1e062dc6890": {
+    "source": "请填写单个有效的 IPv4 或 IPv6 地址，不支持网段",
+    "zh-CN": "请填写单个有效的 IPv4 或 IPv6 地址，不支持网段",
+    "en": "Enter a single valid IPv4 or IPv6 address. Networks are not supported.",
+    "prefix": false
+  },
+  "backend.b473a709fe00": {
+    "source": "过期时间必须晚于当前时间，且有效期最长为 30 天（1 个月）",
+    "zh-CN": "过期时间必须晚于当前时间，且有效期最长为 30 天（1 个月）",
+    "en": "Expiration must be in the future and no more than 30 days (1 month) away",
+    "prefix": false
+  },
+  "backend.37cdfdb143a7": {
+    "source": "操作失败：",
+    "zh-CN": "操作失败：{0}",
+    "en": "Operation failed: {0}",
+    "prefix": true
+  },
+  "backend.dcf553dcc6c7": {
+    "source": "分页参数无效：",
+    "zh-CN": "分页参数无效：{0}",
+    "en": "Invalid pagination parameter: {0}",
+    "prefix": true
+  },
+  "backend.894ce38a7776": {
+    "source": "网页外部来源必须是 HTTP 或 HTTPS 的协议、主机和可选端口，不能包含路径或认证信息",
+    "zh-CN": "网页外部来源必须是 HTTP 或 HTTPS 的协议、主机和可选端口，不能包含路径或认证信息",
+    "en": "The public web origin must be HTTP or HTTPS with a host and optional port, without paths or authentication information",
+    "prefix": false
+  },
+  "backend.29e4d3ca6dfe": {
+    "source": "JSON 配置无效",
+    "zh-CN": "JSON 配置无效",
+    "en": "Invalid JSON configuration",
+    "prefix": false
+  },
+  "backend.528788f55424": {
+    "source": "只允许一个 JSON 对象",
+    "zh-CN": "只允许一个 JSON 对象",
+    "en": "Only one JSON object is allowed",
+    "prefix": false
+  },
+  "backend.c49d8684e46f": {
+    "source": "接口不存在",
+    "zh-CN": "接口不存在",
+    "en": "API endpoint does not exist",
+    "prefix": false
+  },
+  "backend.950e65ba651a": {
+    "source": "不允许跨站请求",
+    "zh-CN": "不允许跨站请求",
+    "en": "Cross-site requests are not allowed",
+    "prefix": false
+  },
+  "backend.d324e59c1f37": {
+    "source": "请使用 application/json",
+    "zh-CN": "请使用 application/json",
+    "en": "Use application/json",
+    "prefix": false
+  },
+  "backend.48144f96c150": {
+    "source": "请先登录",
+    "zh-CN": "请先登录",
+    "en": "Please sign in first",
+    "prefix": false
+  },
+  "backend.ae808c796365": {
+    "source": "登录尝试过多，请一分钟后再试",
+    "zh-CN": "登录尝试过多，请一分钟后再试",
+    "en": "Too many login attempts. Try again in one minute.",
+    "prefix": false
+  },
+  "backend.3b7b56eef3c3": {
+    "source": "用户名或密码不正确",
+    "zh-CN": "用户名或密码不正确",
+    "en": "Incorrect username or password",
+    "prefix": false
+  },
+  "backend.360b13c5f49d": {
+    "source": "创建登录会话失败",
+    "zh-CN": "创建登录会话失败",
+    "en": "Failed to create login session",
+    "prefix": false
+  },
+  "backend.329bd1fd9b79": {
+    "source": "登录会话过多，请先退出其他会话",
+    "zh-CN": "登录会话过多，请先退出其他会话",
+    "en": "Too many login sessions. Sign out of other sessions first.",
+    "prefix": false
+  },
+  "backend.b5183983ef3a": {
+    "source": "请重新登录",
+    "zh-CN": "请重新登录",
+    "en": "Please sign in again",
+    "prefix": false
+  },
+  "backend.b3aa6060a3e8": {
+    "source": "更新配置必须提供读取时的 revision",
+    "zh-CN": "更新配置必须提供读取时的 revision",
+    "en": "Configuration updates require the revision from the original read",
+    "prefix": false
+  },
+  "backend.068d0fcf4b7a": {
+    "source": "目标 ID 已存在",
+    "zh-CN": "目标 ID 已存在",
+    "en": "Target ID already exists",
+    "prefix": false
+  },
+  "backend.e4ce96a95228": {
+    "source": "读取目标失败",
+    "zh-CN": "读取目标失败",
+    "en": "Failed to read target",
+    "prefix": false
+  },
+  "backend.6ade7baf8737": {
+    "source": "保存失败：",
+    "zh-CN": "保存失败：{0}",
+    "en": "Failed to save: {0}",
+    "prefix": true
+  },
+  "backend.fc776336a006": {
+    "source": "目标不存在或删除失败",
+    "zh-CN": "目标不存在或删除失败",
+    "en": "Target does not exist or could not be deleted",
+    "prefix": false
+  },
+  "backend.0345759cbb7d": {
+    "source": "连接测试失败：",
+    "zh-CN": "连接测试失败：{0}",
+    "en": "Connection test failed: {0}",
+    "prefix": true
+  },
+  "backend.26c076344dde": {
+    "source": "请填写有效的主机和端口",
+    "zh-CN": "请填写有效的主机和端口",
+    "en": "Enter a valid host and port",
+    "prefix": false
+  },
+  "backend.a9fb0c340a45": {
+    "source": "读取主机指纹失败：",
+    "zh-CN": "读取主机指纹失败：{0}",
+    "en": "Failed to read host fingerprint: {0}",
+    "prefix": true
+  },
+  "backend.14a7126cd987": {
+    "source": "当前来源 IP 不允许访问，或目标已禁用",
+    "zh-CN": "当前来源 IP 不允许访问，或目标已禁用",
+    "en": "Current source IP is not allowed or target is disabled",
+    "prefix": false
+  },
+  "backend.eef284249061": {
+    "source": "网页终端数量已达上限",
+    "zh-CN": "网页终端数量已达上限",
+    "en": "Web terminal limit reached",
+    "prefix": false
+  },
+  "backend.fbedd46b3c52": {
+    "source": "配置或登录状态已变化，连接已断开",
+    "zh-CN": "配置或登录状态已变化，连接已断开",
+    "en": "Configuration or login state changed. Connection closed.",
+    "prefix": false
+  },
+  "backend.2e77d70fad42": {
+    "source": "连接目标失败：",
+    "zh-CN": "连接目标失败：{0}",
+    "en": "Failed to connect to target: {0}",
+    "prefix": true
+  },
+  "backend.bfc9964615ed": {
+    "source": "目标硬件信息响应过大",
+    "zh-CN": "目标硬件信息响应过大",
+    "en": "Target hardware response is too large",
+    "prefix": false
+  },
+  "backend.ed6683cfc4f3": {
+    "source": "无法读取目标硬件信息：%w",
+    "zh-CN": "无法读取目标硬件信息：{0}",
+    "en": "Unable to read target hardware information: {0}",
+    "prefix": false
+  },
+  "backend.905002dfeeb1": {
+    "source": "所选中转账号没有可用密码，请重新保存中转凭证",
+    "zh-CN": "所选中转账号没有可用密码，请重新保存中转凭证",
+    "en": "The selected relay account has no usable password. Save the relay credentials again.",
+    "prefix": false
+  },
+  "backend.bdd506a79b9f": {
+    "source": "终端尺寸无效",
+    "zh-CN": "终端尺寸无效",
+    "en": "Invalid terminal dimensions",
+    "prefix": false
+  },
+  "backend.6d5f8843897e": {
+    "source": "请填写名称、所属服务器和有效的服务主机地址",
+    "zh-CN": "请填写名称、所属服务器和有效的服务主机地址",
+    "en": "Enter a name, server, and valid service host address",
+    "prefix": false
+  },
+  "backend.c823f062a70d": {
+    "source": "转发方向无效",
+    "zh-CN": "转发方向无效",
+    "en": "Invalid forwarding direction",
+    "prefix": false
+  },
+  "backend.b61c9a3143dd": {
+    "source": "访问范围无效",
+    "zh-CN": "访问范围无效",
+    "en": "Invalid access scope",
+    "prefix": false
+  },
+  "backend.5d3949edc574": {
+    "source": "所属服务器不存在",
+    "zh-CN": "所属服务器不存在",
+    "en": "Server does not exist",
+    "prefix": false
+  },
+  "backend.b3b8220b078b": {
+    "source": "编辑时不能更换所属服务器",
+    "zh-CN": "编辑时不能更换所属服务器",
+    "en": "Cannot change the server when editing",
+    "prefix": false
+  },
+  "backend.347ea3aa2eab": {
+    "source": "映射已被修改，请刷新后重试",
+    "zh-CN": "映射已被修改，请刷新后重试",
+    "en": "Forwarding rule changed. Refresh and try again.",
+    "prefix": false
+  },
+  "backend.b307776a821f": {
+    "source": "映射最多保存 128 条",
+    "zh-CN": "映射最多保存 128 条",
+    "en": "At most 128 forwarding rules can be saved",
+    "prefix": false
+  },
+  "backend.c3acf7d9308e": {
+    "source": "同一监听机上的映射端口已被其他规则使用",
+    "zh-CN": "同一监听机上的映射端口已被其他规则使用",
+    "en": "The listening port is already used by another rule on this machine",
+    "prefix": false
+  },
+  "backend.49821be7b22b": {
+    "source": "请同时填写中转访问域名/IP 和 1–65535 范围内的端口",
+    "zh-CN": "请同时填写中转访问域名/IP 和 1–65535 范围内的端口",
+    "en": "Provide both a relay domain/IP and a port between 1 and 65535",
+    "prefix": false
+  },
+  "backend.31953a45404c": {
+    "source": "域名过长",
+    "zh-CN": "域名过长",
+    "en": "Domain name is too long",
+    "prefix": false
+  },
+  "backend.ebcae982462c": {
+    "source": "请输入有效域名或 IP，不要包含协议、路径或端口",
+    "zh-CN": "请输入有效域名或 IP，不要包含协议、路径或端口",
+    "en": "Enter a valid domain or IP without a protocol, path, or port",
+    "prefix": false
+  },
+  "backend.6e56077f4b75": {
+    "source": "保存中转访问设置失败",
+    "zh-CN": "保存中转访问设置失败",
+    "en": "Failed to save relay access settings",
+    "prefix": false
+  },
+  "backend.c7fdf1860706": {
+    "source": "中转访问地址或端口未配置",
+    "zh-CN": "中转访问地址或端口未配置",
+    "en": "Relay access address or port is not configured",
+    "prefix": false
+  },
+  "backend.e2105b643bac": {
+    "source": "主密码操作需要 HTTPS 或本机回环连接",
+    "zh-CN": "主密码操作需要 HTTPS 或本机回环连接",
+    "en": "Master password operations require HTTPS or a loopback connection",
+    "prefix": false
+  },
+  "backend.55a3bfb34736": {
+    "source": "主密码尝试过多，请一分钟后再试",
+    "zh-CN": "主密码尝试过多，请一分钟后再试",
+    "en": "Too many master password attempts. Try again in one minute.",
+    "prefix": false
+  },
+  "backend.4ae6cf7dfa51": {
+    "source": "正在处理主密码，请稍后重试",
+    "zh-CN": "正在处理主密码，请稍后重试",
+    "en": "Master password is being processed. Please try again later.",
+    "prefix": false
+  },
+  "backend.2b8b16c503ec": {
+    "source": "主密码操作无效",
+    "zh-CN": "主密码操作无效",
+    "en": "Invalid master password operation",
+    "prefix": false
+  },
+  "backend.05ac2bd266af": {
+    "source": "关闭保护时不能同时设置新主密码",
+    "zh-CN": "关闭保护时不能同时设置新主密码",
+    "en": "Cannot set a new master password while disabling protection",
+    "prefix": false
+  },
+  "backend.f6804858cb02": {
+    "source": "管理员密码不正确",
+    "zh-CN": "管理员密码不正确",
+    "en": "Incorrect administrator password",
+    "prefix": false
+  },
+  "backend.4ef922512d3c": {
+    "source": "主密码状态已改变，请重新打开安全设置",
+    "zh-CN": "主密码状态已改变，请重新打开安全设置",
+    "en": "Master password status changed. Reopen Security settings.",
+    "prefix": false
+  },
+  "backend.292c98e2a4d7": {
+    "source": "笔记请求无效",
+    "zh-CN": "笔记请求无效",
+    "en": "Invalid notes request",
+    "prefix": false
+  },
+  "backend.9f60a246dccd": {
+    "source": "未知笔记操作",
+    "zh-CN": "未知笔记操作",
+    "en": "Unknown notes operation",
+    "prefix": false
+  },
+  "backend.9b314d65d6ba": {
+    "source": "笔记必须是 2 MiB 以内的 UTF-8 文本",
+    "zh-CN": "笔记必须是 2 MiB 以内的 UTF-8 文本",
+    "en": "Notes must be UTF-8 text no larger than 2 MiB",
+    "prefix": false
+  },
+  "backend.33f1af1753f0": {
+    "source": "登录已失效或机器授权已撤销",
+    "zh-CN": "登录已失效或机器授权已撤销",
+    "en": "Login expired or machine access revoked",
+    "prefix": false
+  },
+  "backend.0bad97a5e232": {
+    "source": "笔记已修改，请刷新或确认覆盖",
+    "zh-CN": "笔记已修改，请刷新或确认覆盖",
+    "en": "Notes changed. Refresh or confirm overwrite.",
+    "prefix": false
+  },
+  "backend.e3bb3456a04c": {
+    "source": "标签必须是 100 字节以内的单行文本",
+    "zh-CN": "标签必须是 100 字节以内的单行文本",
+    "en": "Tags must be single-line text no longer than 100 bytes",
+    "prefix": false
+  },
+  "backend.b5d1314b4188": {
+    "source": "最多允许 64 个标签",
+    "zh-CN": "最多允许 64 个标签",
+    "en": "At most 64 tags are allowed",
+    "prefix": false
+  },
+  "backend.5f0131070c48": {
+    "source": "仅管理员可操作",
+    "zh-CN": "仅管理员可操作",
+    "en": "Administrator access required",
+    "prefix": false
+  },
+  "backend.ba5106de6240": {
+    "source": "用户名必须为 1～64 位字母、数字、点、下划线或连字符，且不能使用 admin 或 ",
+    "zh-CN": "用户名必须为 1～64 位字母、数字、点、下划线或连字符，且不能使用 admin 或 {0}",
+    "en": "Username must be 1–64 letters, digits, dots, underscores, or hyphens, and cannot be admin or  {0}",
+    "prefix": true
+  },
+  "backend.961d307c044c": {
+    "source": "密码长度必须在 12～72 字节之间",
+    "zh-CN": "密码长度必须在 12～72 字节之间",
+    "en": "Password must be 12–72 bytes",
+    "prefix": false
+  },
+  "backend.d1ee5409856b": {
+    "source": "用户名已存在",
+    "zh-CN": "用户名已存在",
+    "en": "Username already exists",
+    "prefix": false
+  },
+  "backend.a82de572ccd7": {
+    "source": "用户不存在",
+    "zh-CN": "用户不存在",
+    "en": "User does not exist",
+    "prefix": false
+  },
+  "backend.6bdea436273b": {
+    "source": "用户名不可修改",
+    "zh-CN": "用户名不可修改",
+    "en": "Username cannot be changed",
+    "prefix": false
+  },
+  "backend.879110ecc638": {
+    "source": "所选机器不存在",
+    "zh-CN": "所选机器不存在",
+    "en": "Selected machine does not exist",
+    "prefix": false
+  },
+  "backend.80fc90c541dc": {
+    "source": "迁移笔记失败，原文件已保留：%w",
+    "zh-CN": "迁移笔记失败，原文件已保留：{0}",
+    "en": "Notes migration failed. Original files were kept: {0}",
+    "prefix": false
+  },
+  "backend.11bbd1856b44": {
+    "source": "旧笔记目录必须是普通目录",
+    "zh-CN": "旧笔记目录必须是普通目录",
+    "en": "The old notes directory must be a regular directory",
+    "prefix": false
+  },
+  "backend.04458c7e3b58": {
+    "source": "笔记 %s 必须是普通文件",
+    "zh-CN": "笔记 {0} 必须是普通文件",
+    "en": "Note {0} must be a regular file",
+    "prefix": false
+  },
+  "backend.bb4b838d1750": {
+    "source": "笔记 %s 必须是 2 MiB 以内的 UTF-8 文本",
+    "zh-CN": "笔记 {0} 必须是 2 MiB 以内的 UTF-8 文本",
+    "en": "Note {0} must be UTF-8 text no larger than 2 MiB",
+    "prefix": false
+  },
+  "backend.fea5d23652ed": {
+    "source": "无法确定 LOCALAPPDATA",
+    "zh-CN": "无法确定 LOCALAPPDATA",
+    "en": "Unable to determine LOCALAPPDATA",
+    "prefix": false
+  },
+  "backend.7c17cf0b1393": {
+    "source": "此数据目录已有服务运行，请先退出该服务：%w",
+    "zh-CN": "此数据目录已有服务运行，请先退出该服务：{0}",
+    "en": "A service is already using this data directory. Quit that service first: {0}",
+    "prefix": false
+  },
+  "backend.a943b4704663": {
+    "source": "机器操作繁忙，请稍后重试",
+    "zh-CN": "机器操作繁忙，请稍后重试",
+    "en": "Machine is busy. Please try again later.",
+    "prefix": false
+  },
+  "backend.3586c167c26d": {
+    "source": "文件路径无效",
+    "zh-CN": "文件路径无效",
+    "en": "Invalid file path",
+    "prefix": false
+  },
+  "backend.e42e56338403": {
+    "source": "请使用绝对路径",
+    "zh-CN": "请使用绝对路径",
+    "en": "Use an absolute path",
+    "prefix": false
+  },
+  "backend.2f9f6905feac": {
+    "source": "仅支持查看普通文件",
+    "zh-CN": "仅支持查看普通文件",
+    "en": "Only regular files can be viewed",
+    "prefix": false
+  },
+  "backend.5985a6397853": {
+    "source": "文件超过 2 MiB，请下载查看",
+    "zh-CN": "文件超过 2 MiB，请下载查看",
+    "en": "File exceeds 2 MiB. Download it to view.",
+    "prefix": false
+  },
+  "backend.5a9a0ce47629": {
+    "source": "文件不是 UTF-8 文本，请下载查看",
+    "zh-CN": "文件不是 UTF-8 文本，请下载查看",
+    "en": "File is not UTF-8 text. Download it to view.",
+    "prefix": false
+  },
+  "backend.d2fa73a4f92e": {
+    "source": "不能覆盖目录或符号链接",
+    "zh-CN": "不能覆盖目录或符号链接",
+    "en": "Cannot overwrite a directory or symbolic link",
+    "prefix": false
+  },
+  "backend.e64e8419ca18": {
+    "source": "同名文件已存在",
+    "zh-CN": "同名文件已存在",
+    "en": "A file with this name already exists",
+    "prefix": false
+  },
+  "backend.bc00a6c7eab1": {
+    "source": "目标不支持安全替换现有文件",
+    "zh-CN": "目标不支持安全替换现有文件",
+    "en": "Target does not support safe replacement of existing files",
+    "prefix": false
+  },
+  "backend.e74af67bb8e8": {
+    "source": "无法读取原文件属主，已取消覆盖",
+    "zh-CN": "无法读取原文件属主，已取消覆盖",
+    "en": "Unable to read the original file owner. Overwrite canceled.",
+    "prefix": false
+  },
+  "backend.95d78a08bbe3": {
+    "source": "无法读取临时文件属主，已取消覆盖",
+    "zh-CN": "无法读取临时文件属主，已取消覆盖",
+    "en": "Unable to read the temporary file owner. Overwrite canceled.",
+    "prefix": false
+  },
+  "backend.134e29dd63d0": {
+    "source": "无法保留原文件属主和属组，已取消覆盖：%w",
+    "zh-CN": "无法保留原文件属主和属组，已取消覆盖：{0}",
+    "en": "Unable to preserve original file owner and group. Overwrite canceled: {0}",
+    "prefix": false
+  },
+  "backend.2f18db41f18c": {
+    "source": "上传超过 1 GiB 限制",
+    "zh-CN": "上传超过 1 GiB 限制",
+    "en": "Upload exceeds the 1 GiB limit",
+    "prefix": false
+  },
+  "backend.84ab9704d0fa": {
+    "source": "远程文件已变化，请重新读取或确认覆盖",
+    "zh-CN": "远程文件已变化，请重新读取或确认覆盖",
+    "en": "Remote file changed. Reload or confirm overwrite.",
+    "prefix": false
+  },
+  "backend.c72bbdc665cd": {
+    "source": "目录层级过深",
+    "zh-CN": "目录层级过深",
+    "en": "Directory nesting is too deep",
+    "prefix": false
+  },
+  "backend.96ad36fe4ace": {
+    "source": "文件请求无效",
+    "zh-CN": "文件请求无效",
+    "en": "Invalid file request",
+    "prefix": false
+  },
+  "backend.5adafbb7740d": {
+    "source": "只允许一个请求对象",
+    "zh-CN": "只允许一个请求对象",
+    "en": "Only one request object is allowed",
+    "prefix": false
+  },
+  "backend.e8ff3986b521": {
+    "source": "无法启动目标 SFTP：%w",
+    "zh-CN": "无法启动目标 SFTP：{0}",
+    "en": "Unable to start target SFTP: {0}",
+    "prefix": false
+  },
+  "backend.4cf99c7620dd": {
+    "source": "文件超过 2 MiB",
+    "zh-CN": "文件超过 2 MiB",
+    "en": "File exceeds 2 MiB",
+    "prefix": false
+  },
+  "backend.6c096cc05f8c": {
+    "source": "仅支持 UTF-8 文本",
+    "zh-CN": "仅支持 UTF-8 文本",
+    "en": "Only UTF-8 text is supported",
+    "prefix": false
+  },
+  "backend.a4cf4703bb8b": {
+    "source": "保存缺少文件版本",
+    "zh-CN": "保存缺少文件版本",
+    "en": "File version is required when saving",
+    "prefix": false
+  },
+  "backend.3ffacdf003ba": {
+    "source": "同名文件或目录已存在",
+    "zh-CN": "同名文件或目录已存在",
+    "en": "A file or directory with this name already exists",
+    "prefix": false
+  },
+  "backend.d3f637896bc2": {
+    "source": "不能新建根目录",
+    "zh-CN": "不能新建根目录",
+    "en": "Cannot create the root directory",
+    "prefix": false
+  },
+  "backend.02211c5d5fa6": {
+    "source": "不能删除根目录",
+    "zh-CN": "不能删除根目录",
+    "en": "Cannot delete the root directory",
+    "prefix": false
+  },
+  "backend.53ff31b27f29": {
+    "source": "未知文件操作",
+    "zh-CN": "未知文件操作",
+    "en": "Unknown file operation",
+    "prefix": false
+  },
+  "backend.3c4ed7f505c3": {
+    "source": "请选择文件绝对路径",
+    "zh-CN": "请选择文件绝对路径",
+    "en": "Select an absolute file path",
+    "prefix": false
+  },
+  "backend.0eb63b225152": {
+    "source": "仅支持下载普通文件",
+    "zh-CN": "仅支持下载普通文件",
+    "en": "Only regular files can be downloaded",
+    "prefix": false
+  },
+  "backend.2860ef6bfba3": {
+    "source": "暂不支持此目标的资源采集（首版支持 Linux）",
+    "zh-CN": "暂不支持此目标的资源采集（首版支持 Linux）",
+    "en": "Resource collection is not supported for this target (currently Linux only)",
+    "prefix": false
+  },
+  "backend.d1c6a4c89005": {
+    "source": "无法读取目标 Linux 资源信息",
+    "zh-CN": "无法读取目标 Linux 资源信息",
+    "en": "Unable to read target Linux resource information",
+    "prefix": false
+  },
+  "backend.39ee6aa1b03c": {
+    "source": "私密文件必须是权限为 0600 的普通文件：%s",
+    "zh-CN": "私密文件必须是权限为 0600 的普通文件：{0}",
+    "en": "Private file must be a regular file with mode 0600: {0}",
+    "prefix": false
+  },
+  "backend.c36ea3bd958e": {
+    "source": "已有数据库但缺少 master.key，请恢复原密钥",
+    "zh-CN": "已有数据库但缺少 master.key，请恢复原密钥",
+    "en": "Database exists but master.key is missing. Restore the original key.",
+    "prefix": false
+  },
+  "backend.4aa96cfdb8fa": {
+    "source": "master.key 损坏或版本不受支持，请恢复原密钥",
+    "zh-CN": "master.key 损坏或版本不受支持，请恢复原密钥",
+    "en": "master.key is corrupt or its version is unsupported. Restore the original key.",
+    "prefix": false
+  },
+  "backend.14648234d584": {
+    "source": "目标 ID 无效",
+    "zh-CN": "目标 ID 无效",
+    "en": "Invalid target ID",
+    "prefix": false
+  },
+  "backend.3bb5cd3173f0": {
+    "source": "不支持的机器操作",
+    "zh-CN": "不支持的机器操作",
+    "en": "Unsupported machine operation",
+    "prefix": false
+  },
+  "backend.25cdd4251023": {
+    "source": "请求内容过大",
+    "zh-CN": "请求内容过大",
+    "en": "Request body is too large",
+    "prefix": false
+  },
+  "backend.150e8a04de10": {
+    "source": "机器响应无效",
+    "zh-CN": "机器响应无效",
+    "en": "Invalid machine response",
+    "prefix": false
+  },
+  "backend.6fffa017bf15": {
+    "source": "下载中断，文件未保存",
+    "zh-CN": "下载中断，文件未保存",
+    "en": "Download interrupted. File was not saved.",
+    "prefix": false
+  },
+  "backend.7907b472528c": {
+    "source": "请求无效或操作过多",
+    "zh-CN": "请求无效或操作过多",
+    "en": "Invalid request or too many operations",
+    "prefix": false
+  },
+  "backend.474d6b947280": {
+    "source": "重复请求",
+    "zh-CN": "重复请求",
+    "en": "Duplicate request",
+    "prefix": false
+  },
+  "backend.0df0189637c3": {
+    "source": "请先解锁凭证",
+    "zh-CN": "请先解锁凭证",
+    "en": "Unlock credentials first",
+    "prefix": false
+  },
+  "backend.54f89020d09c": {
+    "source": "读取服务器凭证失败",
+    "zh-CN": "读取服务器凭证失败",
+    "en": "Failed to read server credentials",
+    "prefix": false
+  },
+  "backend.dd9c4e42368f": {
+    "source": "服务器凭证不存在",
+    "zh-CN": "服务器凭证不存在",
+    "en": "Server credentials do not exist",
+    "prefix": false
+  },
+  "backend.3592ac6d2106": {
+    "source": "服务器账号不存在",
+    "zh-CN": "服务器账号不存在",
+    "en": "Server account does not exist",
+    "prefix": false
+  },
+  "backend.2b1431756f24": {
+    "source": "管理员密码长度必须在 12～72 字节之间",
+    "zh-CN": "管理员密码长度必须在 12～72 字节之间",
+    "en": "Administrator password must be 12–72 bytes",
+    "prefix": false
+  },
+  "backend.5f0d5f595550": {
+    "source": "私密文件权限必须为 0600：%s",
+    "zh-CN": "私密文件权限必须为 0600：{0}",
+    "en": "Private file permissions must be 0600: {0}",
+    "prefix": false
+  },
+  "backend.823a16f9fb10": {
+    "source": "搜索内容必须是文本",
+    "zh-CN": "搜索内容必须是文本",
+    "en": "Search query must be text",
+    "prefix": false
+  },
+  "backend.a6626a142c02": {
+    "source": "名称需为 1～24 字，命令需为 1～2000 字的单行文本",
+    "zh-CN": "名称需为 1～24 字，命令需为 1～2000 字的单行文本",
+    "en": "Name must be 1–24 characters and command must be 1–2000 characters of single-line text",
+    "prefix": false
+  },
+  "backend.ca8dcc0d6f29": {
+    "source": "请选择机器范围或至少一个标签，不能混合指定",
+    "zh-CN": "请选择机器范围或至少一个标签，不能混合指定",
+    "en": "Select a machine scope or at least one tag; do not combine them",
+    "prefix": false
+  },
+  "backend.fdc64c5d0e56": {
+    "source": "快捷命令不存在",
+    "zh-CN": "快捷命令不存在",
+    "en": "Quick command does not exist",
+    "prefix": false
+  },
+  "backend.0a29ba1e3b3b": {
+    "source": "请先选择可用的数据目录",
+    "zh-CN": "请先选择可用的数据目录",
+    "en": "Choose a usable data directory first",
+    "prefix": false
+  },
+  "backend.12443ef50a57": {
+    "source": "服务未初始化",
+    "zh-CN": "服务未初始化",
+    "en": "Service is not initialized",
+    "prefix": false
+  },
+  "backend.c28e34a80ce5": {
+    "source": "已有数据目录，请退出应用后通过 -data 指定其他目录",
+    "zh-CN": "已有数据目录，请退出应用后通过 -data 指定其他目录",
+    "en": "A data directory already exists. Quit the app and use -data to select a different directory.",
+    "prefix": false
+  },
+  "backend.6344276862ec": {
+    "source": "选择 SSH Gateway数据目录",
+    "zh-CN": "选择 SSH Gateway数据目录",
+    "en": "Choose SSH Gateway data directory",
+    "prefix": false
+  },
+  "backend.38c91dede2dc": {
+    "source": "所选目录无法打开",
+    "zh-CN": "所选目录无法打开",
+    "en": "Unable to open selected directory",
+    "prefix": false
+  },
+  "backend.267e3e1a658d": {
+    "source": "SSH Gateway",
+    "zh-CN": "SSH Gateway",
+    "en": "SSH Gateway",
+    "prefix": false
+  },
+  "backend.91a1d31663b9": {
+    "source": "显示主窗口",
+    "zh-CN": "显示主窗口",
+    "en": "Show main window",
+    "prefix": false
+  },
+  "backend.b0d269c8707c": {
+    "source": "退出应用",
+    "zh-CN": "退出应用",
+    "en": "Quit app",
+    "prefix": false
+  },
+  "backend.2404b45944d9": {
+    "source": "选择上传文件（最大 1 GiB）",
+    "zh-CN": "选择上传文件（最大 1 GiB）",
+    "en": "Select a file to upload (maximum 1 GiB)",
+    "prefix": false
+  },
+  "backend.fb2c92fc6af2": {
+    "source": "已取消上传",
+    "zh-CN": "已取消上传",
+    "en": "Upload canceled",
+    "prefix": false
+  },
+  "backend.97cfcc9778fe": {
+    "source": "请选择不超过 1 GiB 的普通文件",
+    "zh-CN": "请选择不超过 1 GiB 的普通文件",
+    "en": "Select a regular file no larger than 1 GiB",
+    "prefix": false
+  },
+  "backend.24b822c76aef": {
+    "source": "不支持的传输操作",
+    "zh-CN": "不支持的传输操作",
+    "en": "Unsupported transfer operation",
+    "prefix": false
+  },
+  "backend.039d3522c433": {
+    "source": "保存下载文件",
+    "zh-CN": "保存下载文件",
+    "en": "Save downloaded file",
+    "prefix": false
+  },
+  "backend.bc137adc57dd": {
+    "source": "已取消下载",
+    "zh-CN": "已取消下载",
+    "en": "Download canceled",
+    "prefix": false
+  },
+  "backend.e281e283faca": {
+    "source": "仅支持 HTTP 或 HTTPS 网页地址",
+    "zh-CN": "仅支持 HTTP 或 HTTPS 网页地址",
+    "en": "Only HTTP or HTTPS web addresses are supported",
+    "prefix": false
+  },
+  "backend.ebab1f0376cd": {
+    "source": "更新检查重定向次数过多",
+    "zh-CN": "更新检查重定向次数过多",
+    "en": "Too many redirects while checking for updates",
+    "prefix": false
+  },
+  "backend.581a4dadafe9": {
+    "source": "更新检查重定向到不受信任的地址",
+    "zh-CN": "更新检查重定向到不受信任的地址",
+    "en": "Update check redirected to an untrusted address",
+    "prefix": false
+  },
+  "backend.f1d9bd1f0be8": {
+    "source": "不支持的正式版本号：%s",
+    "zh-CN": "不支持的正式版本号：{0}",
+    "en": "Unsupported stable version: {0}",
+    "prefix": false
+  },
+  "backend.04cde8464dc0": {
+    "source": "版本号超出范围",
+    "zh-CN": "版本号超出范围",
+    "en": "Version number is out of range",
+    "prefix": false
+  },
+  "backend.5c28b716eac5": {
+    "source": "更新地址必须来自 GitHub HTTPS",
+    "zh-CN": "更新地址必须来自 GitHub HTTPS",
+    "en": "Update URL must use GitHub HTTPS",
+    "prefix": false
+  },
+  "backend.4f7cbf3f12fd": {
+    "source": "连接 GitHub 失败：%w",
+    "zh-CN": "连接 GitHub 失败：{0}",
+    "en": "Failed to connect to GitHub: {0}",
+    "prefix": false
+  },
+  "backend.30a2504264b9": {
+    "source": "尚无可用的公开正式版本，或发布仓库不存在",
+    "zh-CN": "尚无可用的公开正式版本，或发布仓库不存在",
+    "en": "No public stable release available, or the release repository does not exist",
+    "prefix": false
+  },
+  "backend.1b4a9d2980c3": {
+    "source": "GitHub 暂时限制请求，请稍后重试",
+    "zh-CN": "GitHub 暂时限制请求，请稍后重试",
+    "en": "GitHub is temporarily limiting requests. Please try again later.",
+    "prefix": false
+  },
+  "backend.da3f3996dba0": {
+    "source": "GitHub 返回 HTTP %d",
+    "zh-CN": "GitHub 返回 HTTP {0}",
+    "en": "GitHub returned HTTP {0}",
+    "prefix": false
+  },
+  "backend.d369e4b3e19d": {
+    "source": "发布仓库格式应为 owner/repo",
+    "zh-CN": "发布仓库格式应为 owner/repo",
+    "en": "Release repository must use owner/repo format",
+    "prefix": false
+  },
+  "backend.76d9229391af": {
+    "source": "版本信息过大",
+    "zh-CN": "版本信息过大",
+    "en": "Version information is too large",
+    "prefix": false
+  },
+  "backend.cd2e805e8e7a": {
+    "source": "版本信息格式错误：%w",
+    "zh-CN": "版本信息格式错误：{0}",
+    "en": "Invalid version information: {0}",
+    "prefix": false
+  },
+  "backend.55d97f64b90b": {
+    "source": "更新源不是正式发布",
+    "zh-CN": "更新源不是正式发布",
+    "en": "Update source is not a stable release",
+    "prefix": false
+  },
+  "backend.canceled": {
+    "source": "操作已取消",
+    "zh-CN": "操作已取消",
+    "en": "Operation canceled",
+    "prefix": false
+  },
+  "backend.b527e241fdf3": {
+    "source": "无法核验远程监听范围；请在远程服务器确认实际绑定地址",
+    "zh-CN": "无法核验远程监听范围；请在远程服务器确认实际绑定地址",
+    "en": "Unable to verify the remote listening scope. Check the actual bound address on the remote server.",
+    "prefix": false
+  },
+  "backend.bd1b80c95aba": {
+    "source": "未能定位远程监听地址，访问范围待核验",
+    "zh-CN": "未能定位远程监听地址，访问范围待核验",
+    "en": "Remote listening address not found. Access scope has not been verified.",
+    "prefix": false
+  },
+  "backend.b7005ef592f2": {
+    "source": "终端已退出：",
+    "zh-CN": "终端已退出：{0}",
+    "en": "Terminal exited: {0}",
+    "prefix": true
+  },
+  "backend.feature.9eeae5f97814": {
+    "source": "主密钥已变化，请重启后备份",
+    "zh-CN": "主密钥已变化，请重启后备份",
+    "en": "The master key changed. Restart before backing up.",
+    "prefix": false
+  },
+  "backend.feature.963da36e7927": {
+    "source": "备份期间主密钥发生变化，请重试",
+    "zh-CN": "备份期间主密钥发生变化，请重试",
+    "en": "The master key changed during backup. Try again.",
+    "prefix": false
+  },
+  "backend.feature.666154a43582": {
+    "source": "备份超过 64 MiB 限制",
+    "zh-CN": "备份超过 64 MiB 限制",
+    "en": "Backup exceeds the 64 MiB limit",
+    "prefix": false
+  },
+  "backend.feature.d94790625dd7": {
+    "source": "备份文件类型或大小无效",
+    "zh-CN": "备份文件类型或大小无效",
+    "en": "Invalid backup file type or size",
+    "prefix": false
+  },
+  "backend.feature.8a244e98a855": {
+    "source": "备份格式、大小或版本不受支持",
+    "zh-CN": "备份格式、大小或版本不受支持",
+    "en": "Unsupported backup format, size, or version",
+    "prefix": false
+  },
+  "backend.feature.5962be6f14dc": {
+    "source": "备份密码错误或文件已损坏",
+    "zh-CN": "备份密码错误或文件已损坏",
+    "en": "Incorrect backup password or damaged file",
+    "prefix": false
+  },
+  "backend.feature.ecff077209af": {
+    "source": "备份内容无效",
+    "zh-CN": "备份内容无效",
+    "en": "Invalid backup contents",
+    "prefix": false
+  },
+  "backend.feature.0e05c4233895": {
+    "source": "备份版本或文件清单无效",
+    "zh-CN": "备份版本或文件清单无效",
+    "en": "Invalid backup version or file list",
+    "prefix": false
+  },
+  "backend.feature.854926a5ead8": {
+    "source": "备份缺少 %s",
+    "zh-CN": "备份缺少 {0}",
+    "en": "Backup is missing {0}",
+    "prefix": false
+  },
+  "backend.feature.32618927b2cc": {
+    "source": "备份主密钥无效",
+    "zh-CN": "备份主密钥无效",
+    "en": "Invalid backup master key",
+    "prefix": false
+  },
+  "backend.feature.766f346b0368": {
+    "source": "备份 SSH 主机密钥无效",
+    "zh-CN": "备份 SSH 主机密钥无效",
+    "en": "Invalid backup SSH host key",
+    "prefix": false
+  },
+  "backend.feature.5adb6a6d78b2": {
+    "source": "备份数据库完整性检查失败",
+    "zh-CN": "备份数据库完整性检查失败",
+    "en": "Backup database integrity check failed",
+    "prefix": false
+  },
+  "backend.feature.2a59c097cf9a": {
+    "source": "备份数据库与元数据不一致",
+    "zh-CN": "备份数据库与元数据不一致",
+    "en": "Backup database and metadata do not match",
+    "prefix": false
+  },
+  "backend.feature.22fc2691581c": {
+    "source": "备份缺少必需的数据表：%s",
+    "zh-CN": "备份缺少必需的数据表：{0}",
+    "en": "Backup is missing required table: {0}",
+    "prefix": false
+  },
+  "backend.feature.e1668bcb805d": {
+    "source": "中转凭证已过期，请续期后复制",
+    "zh-CN": "中转凭证已过期，请续期后复制",
+    "en": "Relay credentials expired. Renew them before copying.",
+    "prefix": false
+  },
+  "backend.feature.b463fb3aba67": {
+    "source": "引号或转义不完整",
+    "zh-CN": "引号或转义不完整",
+    "en": "Unclosed quote or incomplete escape",
+    "prefix": false
+  },
+  "backend.feature.8330a503f7b6": {
+    "source": "机器 JSON 无效：%w",
+    "zh-CN": "机器 JSON 无效：{0}",
+    "en": "Invalid machine JSON: {0}",
+    "prefix": false
+  },
+  "backend.feature.d022f358bae5": {
+    "source": "只允许一个 JSON 数组",
+    "zh-CN": "只允许一个 JSON 数组",
+    "en": "Only one JSON value is allowed",
+    "prefix": false
+  },
+  "backend.feature.d9576145cbbe": {
+    "source": "只支持单个明确的 Host，不能使用通配符或多个别名",
+    "zh-CN": "只支持单个明确的 Host，不能使用通配符或多个别名",
+    "en": "Only a single explicit Host is supported; wildcards and multiple aliases are not supported",
+    "prefix": false
+  },
+  "backend.feature.3e6250ba9b20": {
+    "source": "配置项参数数量无效：",
+    "zh-CN": "配置项参数数量无效：{0}",
+    "en": "Invalid number of arguments for directive: {0}",
+    "prefix": true
+  },
+  "backend.feature.9072e2f626d8": {
+    "source": "不支持主机变量展开",
+    "zh-CN": "不支持主机变量展开",
+    "en": "Host variable expansion is not supported",
+    "prefix": false
+  },
+  "backend.feature.cc7fcd5fae4a": {
+    "source": "端口无效",
+    "zh-CN": "端口无效",
+    "en": "Invalid port",
+    "prefix": false
+  },
+  "backend.feature.0c328a1915c5": {
+    "source": "不支持配置项：",
+    "zh-CN": "不支持配置项：{0}",
+    "en": "Unsupported directive: {0}",
+    "prefix": true
+  },
+  "backend.feature.6a92dec0e838": {
+    "source": "不支持多个 IdentityFile，请明确选择一个私钥",
+    "zh-CN": "不支持多个 IdentityFile，请明确选择一个私钥",
+    "en": "Multiple IdentityFile directives are not supported. Select one private key.",
+    "prefix": false
+  },
+  "backend.feature.9e7ad38c1d79": {
+    "source": "存在全局配置、Include 或 Match；请先整理为独立的明确 Host 条目",
+    "zh-CN": "存在全局配置、Include 或 Match；请先整理为独立的明确 Host 条目",
+    "en": "Global settings, Include, Match, or unsupported Host patterns are present. Simplify the file into standalone explicit Host entries.",
+    "prefix": false
+  },
+  "backend.feature.ea1adfdbf8d2": {
+    "source": "导入格式必须为 ssh_config 或 json",
+    "zh-CN": "导入格式必须为 ssh_config 或 json",
+    "en": "Import format must be ssh_config or json",
+    "prefix": false
+  },
+  "backend.feature.729e9bc21bb1": {
+    "source": "每次导入必须为 1～200 台机器",
+    "zh-CN": "每次导入必须为 1～200 台机器",
+    "en": "Each import must contain 1–200 machines",
+    "prefix": false
+  },
+  "backend.feature.fcade038a402": {
+    "source": "已有相同主机、端口和账号，默认跳过",
+    "zh-CN": "已有相同主机、端口和账号，默认跳过",
+    "en": "The same host, port, and account already exist; skipped by default",
+    "prefix": false
+  },
+  "backend.feature.e54ead743b6f": {
+    "source": "导入包含重复机器，请重新预览",
+    "zh-CN": "导入包含重复机器，请重新预览",
+    "en": "Duplicate machines detected. Preview again.",
+    "prefix": false
+  },
+  "backend.feature.8f276058cfcd": {
+    "source": "诊断任务过多，请稍后重试",
+    "zh-CN": "诊断任务过多，请稍后重试",
+    "en": "Too many diagnostics jobs. Try again later.",
+    "prefix": false
+  },
+  "backend.feature.c151fe8796e8": {
+    "source": "诊断任务不存在",
+    "zh-CN": "诊断任务不存在",
+    "en": "Diagnostics job does not exist",
+    "prefix": false
+  },
+  "backend.feature.05f2ed792d40": {
+    "source": "保存加密备份",
+    "zh-CN": "保存加密备份",
+    "en": "Save encrypted backup",
+    "prefix": false
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "name": "ssh-gateway-web",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "npm run check:locales && vue-tsc --noEmit && vite build",
+    "test": "playwright test",
+    "bindings": "node scripts/bindings.mjs",
+    "build:desktop": "npm run bindings && npm run check:locales && vue-tsc --noEmit && vite build --mode desktop",
+    "dev:desktop": "vite --mode desktop",
+    "pretest": "npm run build && npm run build:desktop",
+    "check:locales": "node scripts/check-locales.mjs",
+    "demo:screenshots": "npm run build && playwright test --config playwright.demo.config.ts",
+    "demo:serve": "npm run build && node demo/serve.mjs"
+  },
+  "dependencies": {
+    "@wailsio/runtime": "3.0.0-beta.20",
+    "@xterm/addon-fit": "^0.11.0",
+    "@xterm/xterm": "^6.0.0",
+    "monaco-editor": "^0.55.1",
+    "vue": "^3.5.42"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "@vitejs/plugin-vue": "^6.0.8",
+    "typescript": "^5.9.3",
+    "vite": "^8.3.0",
+    "vue-tsc": "^3.3.11"
+  }
+}
