@@ -9,7 +9,7 @@ for (const theme of ['light', 'dark']) {
   for (const language of ['en','zh-CN']) {
    await page.goto('/?lang='+language)
    await expect(page.locator('.stats')).toBeVisible()
-   for (const width of [1440,1024,800]) {
+   for (const width of [1920,1440,1024,800]) {
     await page.setViewportSize({width,height:800})
     const header = (await page.locator('.topbar').boundingBox())!
     expect(header.height).toBeLessThanOrEqual(60)
@@ -18,6 +18,19 @@ for (const theme of ['light', 'dark']) {
     const table = page.locator('.connection-list .table-scroll:visible')
     expect((await table.boundingBox())!.y).toBeLessThan(290)
     expect(await table.evaluate(node => node.scrollWidth <= node.clientWidth + 1), `Table should fit ${width}px viewport (${language})`).toBe(true)
+    const accounts = await table.locator('.account-select').evaluateAll(nodes => nodes.map(node => {
+     const wrapper = node.getBoundingClientRect()
+     const select = node.querySelector('select')!.getBoundingClientRect()
+     const arrow = getComputedStyle(node, '::after')
+     return { width: wrapper.width, edgeGap: Math.abs(wrapper.right - select.right), arrowInset: parseFloat(arrow.right) }
+    }))
+    expect(accounts.length).toBeGreaterThan(0)
+    for (const account of accounts) {
+     expect(account.width).toBeLessThanOrEqual(240)
+     expect(account.edgeGap).toBeLessThanOrEqual(1)
+     expect(account.arrowInset).toBeGreaterThanOrEqual(0)
+     expect(account.arrowInset).toBeLessThanOrEqual(14)
+    }
     await page.locator('[popovertarget="system-settings-menu"]').click()
     await expect(page.locator('#system-settings-menu')).toBeVisible()
     const menu = (await page.locator('#system-settings-menu').boundingBox())!
