@@ -1,3 +1,22 @@
+.shortcut-manager-host {
+  --surface: #fff;
+  --subtle: #f6f8fb;
+  --text: #243247;
+  --muted: #607a71;
+  --border: #e1e7ef;
+  --accent: #0c796d;
+  --selected: #e7f5ed;
+}
+:root[data-theme='dark'] .shortcut-manager-host {
+  --surface: #1d2b2e;
+  --subtle: #1c2a2d;
+  --text: #dce7e5;
+  --muted: #a8bbba;
+  --border: #3e5356;
+  --accent: #21998b;
+  --selected: #23413c;
+}
+
 .machine-page {
   --page: #f2f5f9;
   --surface: #fff;
