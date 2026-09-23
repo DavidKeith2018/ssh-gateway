@@ -1,4 +1,5 @@
 {
+  "setup.adminPasswordTooShort": "Administrator password is too short. Use at least 12 bytes (each English letter, digit, or symbol uses 1 byte).",
   "text.6309a3bb5ba4": "Failed to save",
   "text.ec99e5c45d64": "Failed to update",
   "text.5b81a1dfd7f6": "Delete account “{0}”? This user's sessions and connections will be invalidated.",

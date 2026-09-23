@@ -263,6 +263,9 @@ async function login() {
   loginError.value = ''
   try {
     if (desktopInfo.value?.needs_setup) {
+      const passwordBytes = new TextEncoder().encode(password.value).length
+      if (passwordBytes < 12) throw new Error(msg('setup.adminPasswordTooShort'))
+      if (passwordBytes > 72) throw new Error(msg('backend.2b1431756f24'))
       if (setupProtection.value && setupMaster.value !== setupMasterConfirm.value) throw new Error(msg('text.61153d5c7dd3'))
       await api('/desktop/setup', 'POST', { password: password.value, master_password: setupProtection.value ? setupMaster.value : '' })
       setupMaster.value = setupMasterConfirm.value = ''; await updateDesktop()
@@ -400,7 +403,7 @@ watch([locale, terminal], () => { document.title = terminal.value ? t('text.076f
       <p class="muted">{{ t('text.ebbc334fde39') }}</p>
       <label v-if="!desktopInfo?.needs_setup">{{ t('text.1a3f0617d6de') }}<input v-model="username" autocomplete="username" required :placeholder="t('text.201e3f1c1245')" /></label>
       <p v-if="desktopInfo?.error" class="error" role="alert">{{ display(desktopInfo.error) }}</p><label for="admin-password">{{ display(desktopInfo?.needs_setup ? t('text.b5cbe49121fc') : username === 'ssh-admin' ? t('text.c19091521d71') : t('text.fb5bbea8d049')) }}</label>
-      <input id="admin-password" v-model="password" type="password" autocomplete="current-password" :placeholder="t('text.739d1cc26c30')" required autofocus />
+      <input id="admin-password" v-model="password" type="password" :autocomplete="desktopInfo?.needs_setup ? 'new-password' : 'current-password'" :placeholder="t('text.739d1cc26c30')" required autofocus />
       <template v-if="desktopInfo?.needs_setup && !vault.enabled">
         <label class="checkbox-label"><input v-model="setupProtection" type="checkbox" @change="setupMaster = setupMasterConfirm = ''" />{{ t('text.c4ad8dda3ddd') }}</label>
         <template v-if="setupProtection">
