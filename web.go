@@ -26,6 +26,7 @@ import (
 )
 
 const cookieName = "ssh_gateway_session"
+const browserSessionLifetime = 30 * 24 * time.Hour
 
 type browserSession struct {
 	userID  string
@@ -296,10 +297,10 @@ func (web *Web) login(w http.ResponseWriter, r *http.Request) {
 	if old, err := r.Cookie(cookieName); err == nil {
 		delete(web.sessions, old.Value)
 	}
-	web.sessions[value] = browserSession{expires: now.Add(12 * time.Hour), hash: hash, userID: userID, epoch: epoch}
+	web.sessions[value] = browserSession{expires: now.Add(browserSessionLifetime), hash: hash, userID: userID, epoch: epoch}
 	delete(web.attempts, ip)
 	web.mu.Unlock()
-	http.SetCookie(w, &http.Cookie{Name: cookieName, Value: value, Path: "/", HttpOnly: true, Secure: web.secureRequest(r), SameSite: http.SameSiteStrictMode, MaxAge: 12 * 60 * 60})
+	http.SetCookie(w, &http.Cookie{Name: cookieName, Value: value, Path: "/", HttpOnly: true, Secure: web.secureRequest(r), SameSite: http.SameSiteStrictMode, MaxAge: int(browserSessionLifetime / time.Second)})
 	web.store.logEvent("", ip, "帐号已登录："+input.Username)
 	jsonResponse(w, 200, map[string]bool{"ok": true})
 }
